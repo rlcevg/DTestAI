@@ -1,5 +1,7 @@
 module spring.skirmish;
 
-public import spring.skirmish.skirmish;
-public import spring.skirmish.info;
-public import spring.skirmish.options;
+public {
+	import spring.skirmish.skirmish;
+	import spring.skirmish.info;
+	import spring.skirmish.options;
+}

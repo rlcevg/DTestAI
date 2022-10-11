@@ -3,7 +3,7 @@ module spring.log;
 import spring.bind.callback;
 static import std.string;
 
-struct SLog {
+class CLog {
 	void log(string msg) const
 	in (msg) {
 		gCallback.Log_log(gSkirmishAIId, std.string.toStringz(msg));

@@ -3,7 +3,7 @@ module spring.mod;
 import spring.bind.callback;
 static import std.conv;
 
-struct SMod {
+class CMod {
 	string getFileName() const {
 		return std.conv.to!string(gCallback.Mod_getFileName(gSkirmishAIId));
 	}

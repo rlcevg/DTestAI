@@ -54,7 +54,13 @@ enum EventTopic
 	EVENT_LUA_MESSAGE = 27
 }
 
-enum AIINTERFACE_EVENTS_ABI_VERSION = SInitEvent.sizeof + SReleaseEvent.sizeof + SUpdateEvent.sizeof + SMessageEvent.sizeof + SUnitCreatedEvent.sizeof + SUnitFinishedEvent.sizeof + SUnitIdleEvent.sizeof + SUnitMoveFailedEvent.sizeof + SUnitDamagedEvent.sizeof + SUnitDestroyedEvent.sizeof + SUnitGivenEvent.sizeof + SUnitCapturedEvent.sizeof + SEnemyEnterLOSEvent.sizeof + SEnemyLeaveLOSEvent.sizeof + SEnemyEnterRadarEvent.sizeof + SEnemyLeaveRadarEvent.sizeof + SEnemyDamagedEvent.sizeof + SEnemyDestroyedEvent.sizeof + SWeaponFiredEvent.sizeof + SPlayerCommandEvent.sizeof + SCommandFinishedEvent.sizeof + SSeismicPingEvent.sizeof + SLoadEvent.sizeof + SSaveEvent.sizeof + SEnemyCreatedEvent.sizeof + SEnemyFinishedEvent.sizeof + SLuaMessageEvent.sizeof;
+enum AIINTERFACE_EVENTS_ABI_VERSION = SInitEvent.sizeof + SReleaseEvent.sizeof + SUpdateEvent.sizeof +
+SMessageEvent.sizeof + SUnitCreatedEvent.sizeof + SUnitFinishedEvent.sizeof + SUnitIdleEvent.sizeof +
+SUnitMoveFailedEvent.sizeof + SUnitDamagedEvent.sizeof + SUnitDestroyedEvent.sizeof + SUnitGivenEvent.sizeof +
+SUnitCapturedEvent.sizeof + SEnemyEnterLOSEvent.sizeof + SEnemyLeaveLOSEvent.sizeof + SEnemyEnterRadarEvent.sizeof +
+SEnemyLeaveRadarEvent.sizeof + SEnemyDamagedEvent.sizeof + SEnemyDestroyedEvent.sizeof + SWeaponFiredEvent.sizeof +
+SPlayerCommandEvent.sizeof + SCommandFinishedEvent.sizeof + SSeismicPingEvent.sizeof + SLoadEvent.sizeof +
+SSaveEvent.sizeof + SEnemyCreatedEvent.sizeof + SEnemyFinishedEvent.sizeof + SLuaMessageEvent.sizeof;
 
 /**
  * This AI event initializes a Skirmish AI instance.

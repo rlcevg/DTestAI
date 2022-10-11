@@ -2,8 +2,8 @@ module spring.group;
 
 import spring.bind.callback;
 
-class CGroup : AEntity {
-	this(int _id) { super(_id); }
+struct SGroup {
+	mixin TEntity;
 
 	bool isSelected() const {
 		return gCallback.Group_isSelected(gSkirmishAIId, id);

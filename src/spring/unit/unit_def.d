@@ -9,8 +9,8 @@ import spring.weapon.weapon_mount;
 import spring.util.float4;
 static import std.conv;
 
-class CUnitDef : AEntity {
-	this(int _id) { super(_id); }
+struct SUnitDef {
+	mixin TEntity;
 
 	static bool hasYardMap(int unitDefId) {
 		return gCallback.UnitDef_getYardMap(gSkirmishAIId, unitDefId, UnitFacing.UNIT_FACING_SOUTH, null, -1) > 0;
@@ -40,39 +40,39 @@ class CUnitDef : AEntity {
 		return std.conv.to!string(gCallback.UnitDef_getHumanName(gSkirmishAIId, id));
 	}
 
-	float getUpkeep(in CResource resource) const {
+	float getUpkeep(in SResource resource) const {
 		return gCallback.UnitDef_getUpkeep(gSkirmishAIId, id, resource.id);
 	}
 
-	float getResourceMake(in CResource resource) const {
+	float getResourceMake(in SResource resource) const {
 		return gCallback.UnitDef_getResourceMake(gSkirmishAIId, id, resource.id);
 	}
 
-	float getMakesResource(in CResource resource) const {
+	float getMakesResource(in SResource resource) const {
 		return gCallback.UnitDef_getMakesResource(gSkirmishAIId, id, resource.id);
 	}
 
-	float getCost(in CResource resource) const {
+	float getCost(in SResource resource) const {
 		return gCallback.UnitDef_getCost(gSkirmishAIId, id, resource.id);
 	}
 
-	float getExtractsResource(in CResource resource) const {
+	float getExtractsResource(in SResource resource) const {
 		return gCallback.UnitDef_getExtractsResource(gSkirmishAIId, id, resource.id);
 	}
 
-	float getResourceExtractorRange(in CResource resource) const {
+	float getResourceExtractorRange(in SResource resource) const {
 		return gCallback.UnitDef_getResourceExtractorRange(gSkirmishAIId, id, resource.id);
 	}
 
-	float getWindResourceGenerator(in CResource resource) const {
+	float getWindResourceGenerator(in SResource resource) const {
 		return gCallback.UnitDef_getWindResourceGenerator(gSkirmishAIId, id, resource.id);
 	}
 
-	float getTidalResourceGenerator(in CResource resource) const {
+	float getTidalResourceGenerator(in SResource resource) const {
 		return gCallback.UnitDef_getTidalResourceGenerator(gSkirmishAIId, id, resource.id);
 	}
 
-	float getStorage(in CResource resource) const {
+	float getStorage(in SResource resource) const {
 		return gCallback.UnitDef_getStorage(gSkirmishAIId, id, resource.id);
 	}
 
@@ -684,10 +684,11 @@ class CUnitDef : AEntity {
 		return gCallback.UnitDef_getStockpileDef(gSkirmishAIId, id);
 	}
 
-	int[] getBuildOptions() const {
+	SUnitDef[] getBuildOptions() const {
+		static assert(SUnitDef.sizeof == int.sizeof);
 		int[] ids = new int [gCallback.UnitDef_getBuildOptions(gSkirmishAIId, id, null, -1)];
 		gCallback.UnitDef_getBuildOptions(gSkirmishAIId, id, ids.ptr, cast(int)ids.length);
-		return ids;
+		return cast(SUnitDef[])ids;
 	}
 
 	bool isMoveDataAvailable() const {

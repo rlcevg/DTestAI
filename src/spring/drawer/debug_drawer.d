@@ -5,7 +5,7 @@ import spring.bind.commands;
 import spring.drawer.graph_drawer;
 static import std.string;
 
-struct SDebugDrawer {
+class CDebugDrawer {
 	SGraphDrawer getGraphDrawer() const {
 		return SGraphDrawer();
 	}

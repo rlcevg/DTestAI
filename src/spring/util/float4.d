@@ -13,8 +13,7 @@ union SFloat4 {
 	Sxyzw s;
 	alias s this;
 
-	// @property inout(float*) ptr() inout return => a.ptr;
-	@property inout(float*) ptr() inout return { return a.ptr; }
+	inout(float*) ptr() inout return { return a.ptr; }
 
 	this(float _x, float _y, float _z, float _w = 0) {
 		s.x = _x;

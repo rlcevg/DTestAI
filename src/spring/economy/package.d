@@ -1,4 +1,6 @@
 module spring.economy;
 
-public import spring.economy.economy;
-public import spring.economy.resource;
+public {
+	import spring.economy.economy;
+	import spring.economy.resource;
+}

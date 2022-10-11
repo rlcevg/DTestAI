@@ -91,13 +91,13 @@ class CMap {
 		fillVec(gCallback.Map_getSonarJammerMap, sonarJammerValues);
 	}
 
-	short[] getResourceMapRaw(in CResource resource) const {
+	short[] getResourceMapRaw(in SResource resource) const {
 		short[] resources = new short [gCallback.Map_getResourceMapRaw(gSkirmishAIId, resource.id, null, -1)];
 		gCallback.Map_getResourceMapRaw(gSkirmishAIId, resource.id, resources.ptr, cast(int)resources.length);
 		return resources;
 	}
 
-	SFloat4[] getResourceMapSpotsPositions(in CResource resource) const {
+	SFloat4[] getResourceMapSpotsPositions(in SResource resource) const {
 		int spots_size_raw = gCallback.Map_getResourceMapSpotsPositions(gSkirmishAIId, resource.id, null, -1);
 		if (spots_size_raw % 3 != 0)
 			return [];  // error
@@ -110,11 +110,11 @@ class CMap {
 		return spots;
 	}
 
-	float getResourceMapSpotsAverageIncome(in CResource resource) const {
+	float getResourceMapSpotsAverageIncome(in SResource resource) const {
 		return gCallback.Map_getResourceMapSpotsAverageIncome(gSkirmishAIId, resource.id);
 	}
 
-	SFloat4 getResourceMapSpotsNearest(in CResource resource, in SFloat4 pos) const {
+	SFloat4 getResourceMapSpotsNearest(in SResource resource, in SFloat4 pos) const {
 		SFloat4 posF3_out;
 		gCallback.Map_getResourceMapSpotsNearest(gSkirmishAIId, resource.id, pos.ptr, posF3_out.ptr);
 		return posF3_out;
@@ -136,11 +136,11 @@ class CMap {
 		return gCallback.Map_getElevationAt(gSkirmishAIId, x, z);
 	}
 
-	float getMaxResource(in CResource resource) const {
+	float getMaxResource(in SResource resource) const {
 		return gCallback.Map_getMaxResource(gSkirmishAIId, resource.id);
 	}
 
-	float getExtractorRadius(in CResource resource) const {
+	float getExtractorRadius(in SResource resource) const {
 		return gCallback.Map_getExtractorRadius(gSkirmishAIId, resource.id);
 	}
 
@@ -192,11 +192,11 @@ class CMap {
 		return makeArray(gCallback.Map_getLines, _lines, includeAllies);
 	}
 
-	bool isPossibleToBuildAt(in CUnitDef unitDef, in SFloat4 pos, UnitFacing facing) const {
+	bool isPossibleToBuildAt(in SUnitDef unitDef, in SFloat4 pos, UnitFacing facing) const {
 		return gCallback.Map_isPossibleToBuildAt(gSkirmishAIId, unitDef.id, pos.ptr, facing);
 	}
 
-	SFloat4 findClosestBuildSite(in CUnitDef unitDef, in SFloat4 pos,
+	SFloat4 findClosestBuildSite(in SUnitDef unitDef, in SFloat4 pos,
 			float searchRadius, int minDist, UnitFacing facing) const
 	{
 		SFloat4 posF3_out;

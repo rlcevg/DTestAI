@@ -3,7 +3,7 @@ module spring.engine;
 import spring.bind.callback;
 static import std.conv;
 
-immutable struct SEngine {
+class CEngine {
 	string getVersionFull() const {
 		return std.conv.to!string(gCallback.Engine_Version_getFull(gSkirmishAIId));
 	}

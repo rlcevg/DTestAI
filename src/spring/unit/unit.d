@@ -12,25 +12,16 @@ import spring.economy.resource;
 import spring.weapon.weapon;
 import spring.weapon.weapon_mount;
 import spring.util.float4;
-static import std.conv;
-static import std.string;
+static {
+	import std.conv;
+	import std.string;
+}
 
-class CUnit : AEntityPool {
-	this(int _id) pure in (_id >= 0) { super(_id); }
+struct SUnit {
+	mixin TEntity;
 
-	static int getDefId(int unitId) {
-		return gCallback.Unit_getDef(gSkirmishAIId, unitId);
-	}
-
-	static bool hasCommands(int unitId) {
-		return gCallback.Unit_getCurrentCommands(gSkirmishAIId, unitId) > 0;
-	}
-
-	T getDef(T : CUnitDef = CUnitDef)() const {
-		return new T(gCallback.Unit_getDef(gSkirmishAIId, id));
-	}
-	int getDefId() const {
-		return gCallback.Unit_getDef(gSkirmishAIId, id);
+	SUnitDef getDef() const {
+		return SUnitDef(gCallback.Unit_getDef(gSkirmishAIId, id));
 	}
 
 	int getLimit() const {
@@ -53,11 +44,8 @@ class CUnit : AEntityPool {
 				std.string.toStringz(rulesParamName), std.string.toStringz(defaultValue)));
 	}
 
-	T getTeam(T : CTeam = CTeam)() const {
-		return new T(gCallback.Unit_getTeam(gSkirmishAIId, id));
-	}
-	int getTeamId() const {
-		return gCallback.Unit_getTeam(gSkirmishAIId, id);
+	STeam getTeam() const {
+		return STeam(gCallback.Unit_getTeam(gSkirmishAIId, id));
 	}
 
 	int getAllyTeamId() const {
@@ -88,11 +76,8 @@ class CUnit : AEntityPool {
 		return gCallback.Unit_getExperience(gSkirmishAIId, id);
 	}
 
-	T getGroup(T : CGroup = CGroup)() const {
-		return new T(gCallback.Unit_getGroup(gSkirmishAIId, id));
-	}
-	int getGroupId() const {
-		return gCallback.Unit_getGroup(gSkirmishAIId, id);
+	SGroup getGroup() const {
+		return SGroup(gCallback.Unit_getGroup(gSkirmishAIId, id));
 	}
 
 	float getHealth() const {
@@ -119,11 +104,11 @@ class CUnit : AEntityPool {
 		return gCallback.Unit_getPower(gSkirmishAIId, id);
 	}
 
-	float getResourceUse(in CResource resource) const {
+	float getResourceUse(in SResource resource) const {
 		return gCallback.Unit_getResourceUse(gSkirmishAIId, id, resource.id);
 	}
 
-	float getResourceMake(in CResource resource) const {
+	float getResourceMake(in SResource resource) const {
 		return gCallback.Unit_getResourceMake(gSkirmishAIId, id, resource.id);
 	}
 
@@ -178,11 +163,14 @@ class CUnit : AEntityPool {
 	SCommand[] getCurrentCommands() const {
 		return makeSubEntities!SCommand(gCallback.Unit_getCurrentCommands);
 	}
+	bool hasCommands() const {
+		return gCallback.Unit_getCurrentCommands(gSkirmishAIId, id) > 0;
+	}
 	SCommandDescription[] getSupportedCommands() const {
 		return makeSubEntities!SCommandDescription(gCallback.Unit_getSupportedCommands);
 	}
 
-	void build(in CUnitDef toBuildUnitDef, in SFloat4 buildPos, int facing,
+	void build(in SUnitDef toBuildUnitDef, in SFloat4 buildPos, int facing,
 			short options = 0, int timeOut = int.max) const
 	{
 		SBuildUnitCommand commandData = {
@@ -228,7 +216,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_WAIT_TIME, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void waitForDeathOf(in CUnit toDieUnit, short options, int timeOut) const {
+	void waitForDeathOf(in SUnit toDieUnit, short options, int timeOut) const {
 		SDeathWaitUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -293,7 +281,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_FIGHT, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void attack(in CUnit toAttackUnit, short options, int timeOut) const {
+	void attack(in SUnit toAttackUnit, short options, int timeOut) const {
 		SAttackUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -316,7 +304,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_ATTACK_AREA, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void guard(in CUnit toGuardUnit, short options = 0, int timeOut = int.max) const {
+	void guard(in SUnit toGuardUnit, short options = 0, int timeOut = int.max) const {
 		SGuardUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -337,7 +325,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_AI_SELECT, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void addToGroup(in CGroup toGroup, short options, int timeOut) const {
+	void addToGroup(in SGroup toGroup, short options, int timeOut) const {
 		SGroupAddUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -358,7 +346,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_GROUP_CLEAR, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void repair(in CUnit toRepairUnit, short options, int timeOut) const {
+	void repair(in SUnit toRepairUnit, short options, int timeOut) const {
 		SRepairUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -412,17 +400,14 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_SELF_DESTROY, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void loadUnits(T : CUnit)(in T[] toLoadUnits, short options, int timeOut) const {
-		if (_ids.length < toLoadUnits.length)
-			_ids.length = toLoadUnits.length;
-		foreach (i, u; toLoadUnits)
-			_ids[i] = u.id;
+	void loadUnits(in SUnit[] toLoadUnits, short options, int timeOut) const {
+		static assert(SUnit.sizeof == int.sizeof);
 		SLoadUnitsUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
 			options:options,
 			timeOut:timeOut,
-			toLoadUnitIds:_ids.ptr,
+			toLoadUnitIds:cast(const(int)*)toLoadUnits.ptr,
 			toLoadUnitIds_size:cast(int)toLoadUnits.length
 		};
 		execCmd(CommandTopic.COMMAND_UNIT_LOAD_UNITS, &commandData, exceptMsg!__FUNCTION__);
@@ -440,7 +425,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_LOAD_UNITS_AREA, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void loadOnto(in CUnit transporterUnit, short options, int timeOut) const {
+	void loadOnto(in SUnit transporterUnit, short options, int timeOut) const {
 		SLoadOntoUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -451,7 +436,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_LOAD_ONTO, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void unload(in SFloat4 toPos, in CUnit toUnloadUnit, short options, int timeOut) const {
+	void unload(in SFloat4 toPos, in SUnit toUnloadUnit, short options, int timeOut) const {
 		SUnloadUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -486,7 +471,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_SET_ON_OFF, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void reclaimUnit(in CUnit toReclaimUnit, short options, int timeOut) const {
+	void reclaimUnit(in SUnit toReclaimUnit, short options, int timeOut) const {
 		SReclaimUnitUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -497,7 +482,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_RECLAIM_UNIT, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void reclaimFeature(in CFeature toReclaimFeature, short options, int timeOut) const {
+	void reclaimFeature(in SFeature toReclaimFeature, short options, int timeOut) const {
 		SReclaimFeatureUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -541,7 +526,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_STOCKPILE, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void dGun(in CUnit toAttackUnit, short options, int timeOut) const {
+	void dGun(in SUnit toAttackUnit, short options, int timeOut) const {
 		SDGunUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -597,7 +582,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_SET_TRAJECTORY, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void resurrect(in CFeature toResurrectFeature, short options, int timeOut) const {
+	void resurrect(in SFeature toResurrectFeature, short options, int timeOut) const {
 		SResurrectUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -620,7 +605,7 @@ class CUnit : AEntityPool {
 		execCmd(CommandTopic.COMMAND_UNIT_RESURRECT_AREA, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void capture(in CUnit toCaptureUnit, short options, int timeOut) const {
+	void capture(in SUnit toCaptureUnit, short options, int timeOut) const {
 		SCaptureUnitCommand commandData = {
 			unitId:id,
 			groupId:-1,
@@ -677,6 +662,4 @@ class CUnit : AEntityPool {
 		};
 		execCmd(CommandTopic.COMMAND_UNIT_CUSTOM, &commandData, exceptMsg!__FUNCTION__);
 	}
-
-	private static int[] _ids;
 }

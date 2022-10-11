@@ -6,8 +6,8 @@ import spring.weapon.damage;
 import spring.weapon.shield;
 static import std.conv;
 
-class CWeaponDef : AEntity {
-	this(int _id) { super(_id); }
+struct SWeaponDef {
+	mixin TEntity;
 
 	SDamage getDamage() const {
 		return SDamage(id);
@@ -149,7 +149,7 @@ class CWeaponDef : AEntity {
 		return gCallback.WeaponDef_getFlightTime(gSkirmishAIId, id);
 	}
 
-	float getCost(in CResource resource) const {
+	float getCost(in SResource resource) const {
 		return gCallback.WeaponDef_getCost(gSkirmishAIId, id, resource.id);
 	}
 

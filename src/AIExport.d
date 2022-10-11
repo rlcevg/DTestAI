@@ -1,23 +1,5 @@
-import ai.ai : gAIs, CAI;
-import spring.bind.callback : addCallback, delCallback, setCallback, SSkirmishAICallback;
-import std.exception;
-import core.runtime;
-
-enum int ERROR_UNKNOWN = 100;
-enum int ERROR_EXCEPT  = ERROR_UNKNOWN + 1;
-enum int ERROR_RUNTIME = ERROR_UNKNOWN + 2;
-
-int tryCatch(int delegate() func) {
-	int ret = ERROR_UNKNOWN;
-
-	try {
-		ret = func();
-	} catch (Exception e) {
-		ret = ERROR_EXCEPT;
-	}
-
-	return ret;
-}
+import spring.bind.callback : SSkirmishAICallback;
+import dmain : SMain;
 
 version(unittest)
 int main() {
@@ -25,39 +7,50 @@ int main() {
 }
 
 version(Windows) {
-import core.sys.windows.windows;
-import core.sys.windows.dll;
-
-mixin SimpleDllMain;
+	import core.sys.windows.windef : HINSTANCE, BOOL, DWORD, LPVOID;
+	extern (Windows) BOOL DllMain(HINSTANCE hInstance, DWORD ulReason, LPVOID reserved) {
+		import core.sys.windows.winnt;
+		import core.sys.windows.dll : dll_process_attach, dll_process_detach, dll_thread_attach, dll_thread_detach;
+		switch (ulReason) {
+			default: assert(0);
+			case DLL_PROCESS_ATTACH:
+				return true;  // return dll_process_attach( hInstance, true );
+			case DLL_PROCESS_DETACH:
+				// dll_process_detach( hInstance, true );
+				return true;
+			case DLL_THREAD_ATTACH:
+				return true;  // return dll_thread_attach( true, true );
+			case DLL_THREAD_DETACH:
+				return true;  // return dll_thread_detach( true, true );
+		}
+	}
 }
 
-extern (C) export:
+pragma(crt_constructor)
+extern (C) void initDll() nothrow @nogc {
+	proxy.ctor();
+}
 
-	int init(int skirmishAIId, const(SSkirmishAICallback)* innerCallback) {
-	if (!Runtime.initialize())
-		return ERROR_RUNTIME;
-	int initAI() {
-		addCallback(skirmishAIId, innerCallback);
-		gAIs[skirmishAIId] = new CAI(skirmishAIId);
-		return 0;
-	}
-	return tryCatch(&initAI);  // (ret != 0) => error
+pragma(crt_destructor)
+extern (C) void finiDll() nothrow @nogc {
+	proxy.dtor();
+}
+
+SMain proxy;
+
+
+extern (C) export nothrow @nogc:
+
+int init(int skirmishAIId, const(SSkirmishAICallback)* innerCallback) {
+	proxy.initialize();
+	return proxy.initC(skirmishAIId, innerCallback);
 }
 
 int release(int skirmishAIId) {
-	scope(exit) Runtime.terminate();
-	int releaseAI() {
-		gAIs.remove(skirmishAIId);
-		delCallback(skirmishAIId);
-		return 0;
-	}
-	return tryCatch(&releaseAI);  // (ret != 0) => error
+	scope(exit) proxy.terminate();
+	return proxy.releaseC(skirmishAIId);
 }
 
 int handleEvent(int skirmishAIId, int topic, const(void)* data) {
-	int handleEventAI() {
-		setCallback(skirmishAIId);
-		return gAIs[skirmishAIId].handleEvent(topic, data);
-	}
-	return tryCatch(&handleEventAI);  // (ret != 0) => error
+	return proxy.handleEventC(skirmishAIId, topic, data);
 }

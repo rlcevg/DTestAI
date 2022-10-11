@@ -1,8 +1,10 @@
 module spring.skirmish.options;
 
 import spring.bind.callback;
-static import std.conv;
-static import std.string;
+static {
+	import std.conv;
+	import std.string;
+}
 
 struct SOptions {
 	int getSize() const {

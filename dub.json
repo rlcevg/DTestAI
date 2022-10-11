@@ -1,0 +1,12 @@
+{
+	"name": "dtestai",
+	"description": "D example AI with C binding for Spring RTS.",
+	"authors": [
+		"rlcevg"
+	],
+	"copyright": "Copyright © 2022, rlcevg",
+	"license": "MIT",
+	"targetType": "dynamicLibrary",
+	"targetName": "SkirmishAI",
+	"targetPath": "data"
+}

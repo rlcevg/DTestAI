@@ -2,10 +2,12 @@ module spring.lua;
 
 import spring.bind.callback;
 import spring.bind.commands;
-static import std.conv;
-static import std.string;
+static {
+	import std.conv;
+	import std.string;
+}
 
-struct SLua {
+class CLua {
 	string callRules(const(char)* inData, int inSize) const {
 		return callLua!SCallLuaRulesCommand(inData, inSize,
 				CommandTopic.COMMAND_CALL_LUA_RULES, exceptMsg!__FUNCTION__);

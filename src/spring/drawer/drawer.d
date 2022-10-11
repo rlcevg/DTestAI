@@ -35,7 +35,7 @@ struct SDrawer {
 		execCmd(CommandTopic.COMMAND_DRAWER_LINE_ADD, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void drawUnit(in CUnitDef toDrawUnitDef, in SFloat4 pos, float rotation, int lifeTime, int teamId,
+	void drawUnit(in SUnitDef toDrawUnitDef, in SFloat4 pos, float rotation, int lifeTime, int teamId,
 			bool transparent, bool drawBorder, int facing) const
 	{
 		SDrawUnitDrawerCommand commandData;
@@ -51,7 +51,7 @@ struct SDrawer {
 	}
 
 	Tuple!(int, float) traceRay(in SFloat4 rayPos, in SFloat4 rayDir, float rayLen,
-			in CUnit srcUnit, int flags) const
+			in SUnit srcUnit, int flags) const
 	{
 		STraceRayCommand commandData = {
 			rayPos_posF3:rayPos.ptr,
@@ -66,7 +66,7 @@ struct SDrawer {
 	}
 
 	Tuple!(int, float) traceRayFeature(in SFloat4 rayPos, in SFloat4 rayDir, float rayLen,
-			in CUnit srcUnit, int flags) const
+			in SUnit srcUnit, int flags) const
 	{
 		SFeatureTraceRayCommand commandData = {
 			rayPos_posF3:rayPos.ptr,

@@ -4,7 +4,7 @@ import spring.bind.callback;
 import spring.bind.commands;
 import spring.util.float4;
 
-struct SPathing {
+class CPathing {
 	int initPath(in SFloat4 start, in SFloat4 end, int pathType, float goalRadius) const {
 		SInitPathCommand commandData ={
 			start_posF3:start.ptr,

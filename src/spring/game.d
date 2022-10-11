@@ -6,10 +6,12 @@ import spring.team;
 import spring.economy.resource;
 import spring.util.color4;
 import spring.util.float4;
-static import std.conv;
-static import std.string;
+static {
+	import std.conv;
+	import std.string;
+}
 
-struct SGame {
+class CGame {
 	int getCurrentFrame() const {
 		return gCallback.Game_getCurrentFrame(gSkirmishAIId);
 	}
@@ -30,53 +32,53 @@ struct SGame {
 		return gCallback.Game_getPlayerTeam(gSkirmishAIId, playerId);
 	}
 
-	string getTeamSide(in CTeam team) const {
+	string getTeamSide(in STeam team) const {
 		return std.conv.to!string(gCallback.Game_getTeamSide(gSkirmishAIId, team.id));
 	}
 
-	SColor4 getTeamColor(in CTeam team) const {
+	SColor4 getTeamColor(in STeam team) const {
 		short[3] colorS3_out;
 		gCallback.Game_getTeamColor(gSkirmishAIId, team.id, colorS3_out.ptr);
 		return SColor4(colorS3_out);
 	}
 
-	int getTeamAllyTeam(in CTeam team) const {
+	int getTeamAllyTeam(in STeam team) const {
 		return gCallback.Game_getTeamAllyTeam(gSkirmishAIId, team.id);
 	}
 
-	float getTeamResourceCurrent(in CTeam team, in CResource resource) const {
+	float getTeamResourceCurrent(in STeam team, in SResource resource) const {
 		return gCallback.Game_getTeamResourceCurrent(gSkirmishAIId, team.id, resource.id);
 	}
 
-	float getTeamResourceIncome(in CTeam team, in CResource resource) const {
+	float getTeamResourceIncome(in STeam team, in SResource resource) const {
 		return gCallback.Game_getTeamResourceIncome(gSkirmishAIId, team.id, resource.id);
 	}
 
-	float getTeamResourceUsage(in CTeam team, in CResource resource) const {
+	float getTeamResourceUsage(in STeam team, in SResource resource) const {
 		return gCallback.Game_getTeamResourceUsage(gSkirmishAIId, team.id, resource.id);
 	}
 
-	float getTeamResourceStorage(in CTeam team, in CResource resource) const {
+	float getTeamResourceStorage(in STeam team, in SResource resource) const {
 		return gCallback.Game_getTeamResourceStorage(gSkirmishAIId, team.id, resource.id);
 	}
 
-	float getTeamResourcePull(in CTeam team, in CResource resource) const {
+	float getTeamResourcePull(in STeam team, in SResource resource) const {
 		return gCallback.Game_getTeamResourcePull(gSkirmishAIId, team.id, resource.id);
 	}
 
-	float getTeamResourceShare(in CTeam team, in CResource resource) const {
+	float getTeamResourceShare(in STeam team, in SResource resource) const {
 		return gCallback.Game_getTeamResourceShare(gSkirmishAIId, team.id, resource.id);
 	}
 
-	float getTeamResourceSent(in CTeam team, in CResource resource) const {
+	float getTeamResourceSent(in STeam team, in SResource resource) const {
 		return gCallback.Game_getTeamResourceSent(gSkirmishAIId, team.id, resource.id);
 	}
 
-	float getTeamResourceReceived(in CTeam team, in CResource resource) const {
+	float getTeamResourceReceived(in STeam team, in SResource resource) const {
 		return gCallback.Game_getTeamResourceReceived(gSkirmishAIId, team.id, resource.id);
 	}
 
-	float getTeamResourceExcess(in CTeam team, in CResource resource) const {
+	float getTeamResourceExcess(in STeam team, in SResource resource) const {
 		return gCallback.Game_getTeamResourceExcess(gSkirmishAIId, team.id, resource.id);
 	}
 

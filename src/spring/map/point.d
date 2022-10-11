@@ -21,6 +21,6 @@ struct SPoint {
 	}
 
 	string getLabel() const {
-		return std.conv.to!string(gCallback.Map_Point_getLabel(gSkirmishAIId, _id));
+		return std.conv.to!string(gCallback.Map_Point_getLabel(gSkirmishAIId, id));
 	}
 }

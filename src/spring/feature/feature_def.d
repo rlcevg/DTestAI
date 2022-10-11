@@ -4,8 +4,8 @@ import spring.bind.callback;
 import spring.economy.resource;
 static import std.conv;
 
-class CFeatureDef : AEntity {
-	this(int _id) { super(_id); }
+struct SFeatureDef {
+	mixin TEntity;
 
 	string getName() const {
 		return std.conv.to!string(gCallback.FeatureDef_getName(gSkirmishAIId, id));
@@ -15,7 +15,7 @@ class CFeatureDef : AEntity {
 		return std.conv.to!string(gCallback.FeatureDef_getDescription(gSkirmishAIId, id));
 	}
 
-	float getContainedResource(in CResource resource) const {
+	float getContainedResource(in SResource resource) const {
 		return gCallback.FeatureDef_getContainedResource(gSkirmishAIId, id, resource.id);
 	}
 

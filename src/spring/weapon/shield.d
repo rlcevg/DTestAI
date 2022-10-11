@@ -6,7 +6,7 @@ import spring.economy.resource;
 struct SShield {
 	mixin TEntity;  // weaponDefId
 
-	float getResourceUse(in CResource resource) const {
+	float getResourceUse(in SResource resource) const {
 		return gCallback.WeaponDef_Shield_getResourceUse(gSkirmishAIId, id, resource.id);
 	}
 
@@ -30,7 +30,7 @@ struct SShield {
 		return gCallback.WeaponDef_Shield_getPowerRegen(gSkirmishAIId, id);
 	}
 
-	float getPowerRegenResource(in CResource resource) const {
+	float getPowerRegenResource(in SResource resource) const {
 		return gCallback.WeaponDef_Shield_getPowerRegenResource(gSkirmishAIId, id, resource.id);
 	}
 

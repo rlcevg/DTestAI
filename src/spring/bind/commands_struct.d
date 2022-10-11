@@ -157,7 +157,37 @@ enum UnitCommandOptions
 
 enum UNIT_COMMAND_BUILD_NO_FACING = -1;
 
-enum AIINTERFACE_COMMANDS_ABI_VERSION = SSetMyIncomeMultiplierCheatCommand.sizeof + SGiveMeResourceCheatCommand.sizeof + SGiveMeNewUnitCheatCommand.sizeof + SSendTextMessageCommand.sizeof + SSetLastPosMessageCommand.sizeof + SSendResourcesCommand.sizeof + SSendUnitsCommand.sizeof + SCreateGroupCommand.sizeof + SEraseGroupCommand.sizeof + SInitPathCommand.sizeof + SGetApproximateLengthPathCommand.sizeof + SGetNextWaypointPathCommand.sizeof + SFreePathCommand.sizeof + SCallLuaRulesCommand.sizeof + SCallLuaUICommand.sizeof + SSendStartPosCommand.sizeof + SAddNotificationDrawerCommand.sizeof + SAddPointDrawCommand.sizeof + SRemovePointDrawCommand.sizeof + SAddLineDrawCommand.sizeof + SStartPathDrawerCommand.sizeof + SFinishPathDrawerCommand.sizeof + SDrawLinePathDrawerCommand.sizeof + SDrawLineAndIconPathDrawerCommand.sizeof + SDrawIconAtLastPosPathDrawerCommand.sizeof + SBreakPathDrawerCommand.sizeof + SRestartPathDrawerCommand.sizeof + SCreateSplineFigureDrawerCommand.sizeof + SCreateLineFigureDrawerCommand.sizeof + SSetColorFigureDrawerCommand.sizeof + SDeleteFigureDrawerCommand.sizeof + SDrawUnitDrawerCommand.sizeof + SBuildUnitCommand.sizeof + SStopUnitCommand.sizeof + SWaitUnitCommand.sizeof + STimeWaitUnitCommand.sizeof + SDeathWaitUnitCommand.sizeof + SSquadWaitUnitCommand.sizeof + SGatherWaitUnitCommand.sizeof + SMoveUnitCommand.sizeof + SPatrolUnitCommand.sizeof + SFightUnitCommand.sizeof + SAttackUnitCommand.sizeof + SAttackAreaUnitCommand.sizeof + SGuardUnitCommand.sizeof + SAiSelectUnitCommand.sizeof + SGroupAddUnitCommand.sizeof + SGroupClearUnitCommand.sizeof + SRepairUnitCommand.sizeof + SSetFireStateUnitCommand.sizeof + SSetMoveStateUnitCommand.sizeof + SSetBaseUnitCommand.sizeof + SSelfDestroyUnitCommand.sizeof + SLoadUnitsUnitCommand.sizeof + SLoadUnitsAreaUnitCommand.sizeof + SLoadOntoUnitCommand.sizeof + SUnloadUnitCommand.sizeof + SUnloadUnitsAreaUnitCommand.sizeof + SSetOnOffUnitCommand.sizeof + SReclaimUnitUnitCommand.sizeof + SReclaimAreaUnitCommand.sizeof + SCloakUnitCommand.sizeof + SStockpileUnitCommand.sizeof + SDGunUnitCommand.sizeof + SDGunPosUnitCommand.sizeof + SRestoreAreaUnitCommand.sizeof + SSetRepeatUnitCommand.sizeof + SSetTrajectoryUnitCommand.sizeof + SResurrectUnitCommand.sizeof + SResurrectAreaUnitCommand.sizeof + SCaptureUnitCommand.sizeof + SCaptureAreaUnitCommand.sizeof + SSetAutoRepairLevelUnitCommand.sizeof + SSetIdleModeUnitCommand.sizeof + SCustomUnitCommand.sizeof + STraceRayCommand.sizeof + SPauseCommand.sizeof + SReclaimFeatureUnitCommand.sizeof + SSetPositionGraphDrawerDebugCommand.sizeof + SSetSizeGraphDrawerDebugCommand.sizeof + SAddPointLineGraphDrawerDebugCommand.sizeof + SDeletePointsLineGraphDrawerDebugCommand.sizeof + SSetColorLineGraphDrawerDebugCommand.sizeof + SSetLabelLineGraphDrawerDebugCommand.sizeof + SAddOverlayTextureDrawerDebugCommand.sizeof + SUpdateOverlayTextureDrawerDebugCommand.sizeof + SDeleteOverlayTextureDrawerDebugCommand.sizeof + SSetPositionOverlayTextureDrawerDebugCommand.sizeof + SSetSizeOverlayTextureDrawerDebugCommand.sizeof + SSetLabelOverlayTextureDrawerDebugCommand.sizeof + SFeatureTraceRayCommand.sizeof;
+enum AIINTERFACE_COMMANDS_ABI_VERSION = SSetMyIncomeMultiplierCheatCommand.sizeof + SGiveMeResourceCheatCommand.sizeof +
+SGiveMeNewUnitCheatCommand.sizeof + SSendTextMessageCommand.sizeof + SSetLastPosMessageCommand.sizeof +
+SSendResourcesCommand.sizeof + SSendUnitsCommand.sizeof + SCreateGroupCommand.sizeof + SEraseGroupCommand.sizeof +
+SInitPathCommand.sizeof + SGetApproximateLengthPathCommand.sizeof + SGetNextWaypointPathCommand.sizeof +
+SFreePathCommand.sizeof + SCallLuaRulesCommand.sizeof + SCallLuaUICommand.sizeof + SSendStartPosCommand.sizeof +
+SAddNotificationDrawerCommand.sizeof + SAddPointDrawCommand.sizeof + SRemovePointDrawCommand.sizeof +
+SAddLineDrawCommand.sizeof + SStartPathDrawerCommand.sizeof + SFinishPathDrawerCommand.sizeof +
+SDrawLinePathDrawerCommand.sizeof + SDrawLineAndIconPathDrawerCommand.sizeof +
+SDrawIconAtLastPosPathDrawerCommand.sizeof + SBreakPathDrawerCommand.sizeof + SRestartPathDrawerCommand.sizeof +
+SCreateSplineFigureDrawerCommand.sizeof + SCreateLineFigureDrawerCommand.sizeof + SSetColorFigureDrawerCommand.sizeof +
+SDeleteFigureDrawerCommand.sizeof + SDrawUnitDrawerCommand.sizeof + SBuildUnitCommand.sizeof + SStopUnitCommand.sizeof +
+SWaitUnitCommand.sizeof + STimeWaitUnitCommand.sizeof + SDeathWaitUnitCommand.sizeof + SSquadWaitUnitCommand.sizeof +
+SGatherWaitUnitCommand.sizeof + SMoveUnitCommand.sizeof + SPatrolUnitCommand.sizeof + SFightUnitCommand.sizeof +
+SAttackUnitCommand.sizeof + SAttackAreaUnitCommand.sizeof + SGuardUnitCommand.sizeof + SAiSelectUnitCommand.sizeof +
+SGroupAddUnitCommand.sizeof + SGroupClearUnitCommand.sizeof + SRepairUnitCommand.sizeof +
+SSetFireStateUnitCommand.sizeof + SSetMoveStateUnitCommand.sizeof + SSetBaseUnitCommand.sizeof +
+SSelfDestroyUnitCommand.sizeof + SLoadUnitsUnitCommand.sizeof + SLoadUnitsAreaUnitCommand.sizeof +
+SLoadOntoUnitCommand.sizeof + SUnloadUnitCommand.sizeof + SUnloadUnitsAreaUnitCommand.sizeof +
+SSetOnOffUnitCommand.sizeof + SReclaimUnitUnitCommand.sizeof + SReclaimAreaUnitCommand.sizeof +
+SCloakUnitCommand.sizeof + SStockpileUnitCommand.sizeof + SDGunUnitCommand.sizeof + SDGunPosUnitCommand.sizeof +
+SRestoreAreaUnitCommand.sizeof + SSetRepeatUnitCommand.sizeof + SSetTrajectoryUnitCommand.sizeof +
+SResurrectUnitCommand.sizeof + SResurrectAreaUnitCommand.sizeof + SCaptureUnitCommand.sizeof +
+SCaptureAreaUnitCommand.sizeof + SSetAutoRepairLevelUnitCommand.sizeof + SSetIdleModeUnitCommand.sizeof +
+SCustomUnitCommand.sizeof + STraceRayCommand.sizeof + SPauseCommand.sizeof + SReclaimFeatureUnitCommand.sizeof +
+SSetPositionGraphDrawerDebugCommand.sizeof + SSetSizeGraphDrawerDebugCommand.sizeof +
+SAddPointLineGraphDrawerDebugCommand.sizeof + SDeletePointsLineGraphDrawerDebugCommand.sizeof +
+SSetColorLineGraphDrawerDebugCommand.sizeof + SSetLabelLineGraphDrawerDebugCommand.sizeof +
+SAddOverlayTextureDrawerDebugCommand.sizeof + SUpdateOverlayTextureDrawerDebugCommand.sizeof +
+SDeleteOverlayTextureDrawerDebugCommand.sizeof + SSetPositionOverlayTextureDrawerDebugCommand.sizeof +
+SSetSizeOverlayTextureDrawerDebugCommand.sizeof + SSetLabelOverlayTextureDrawerDebugCommand.sizeof +
+SFeatureTraceRayCommand.sizeof;
 
 /**
  * Allows one to give an income (dis-)advantage to the team

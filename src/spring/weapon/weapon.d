@@ -6,11 +6,8 @@ import spring.weapon.weapon_def;
 struct SWeapon {
 	mixin TSubEntity!"unitId";
 
-	T getDef(T : CWeaponDef = CWeaponDef)() const {
-		return new T(gCallback.Unit_Weapon_getDef(gSkirmishAIId, unitId, id));
-	}
-	int getDefId() const {
-		return gCallback.Unit_Weapon_getDef(gSkirmishAIId, unitId, id);
+	SWeaponDef getDef() const {
+		return SWeaponDef(gCallback.Unit_Weapon_getDef(gSkirmishAIId, unitId, id));
 	}
 
 	int getReloadFrame() const {

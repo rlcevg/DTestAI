@@ -1,11 +1,13 @@
 module spring.team;
 
 import spring.bind.callback;
-static import std.conv;
-static import std.string;
+static {
+	import std.conv;
+	import std.string;
+}
 
-class CTeam : AEntity {
-	this(int _id) { super(_id); }
+struct STeam {
+	mixin TEntity;
 
 	bool hasAIController() const {
 		return gCallback.Team_hasAIController(gSkirmishAIId, id);

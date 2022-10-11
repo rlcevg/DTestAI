@@ -1,10 +1,12 @@
 module spring.file;
 
 import spring.bind.callback;
-static import std.conv;
-static import std.string;
+static {
+	import std.conv;
+	import std.string;
+}
 
-struct SFile {
+class CFile {
 	int getSize(string fileName) const
 	in (fileName) {
 		return gCallback.File_getSize(gSkirmishAIId, std.string.toStringz(fileName));

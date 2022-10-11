@@ -3,21 +3,20 @@ module spring.feature.feature;
 import spring.bind.callback;
 import spring.feature.feature_def;
 import spring.util.float4;
-static import std.conv;
-static import std.string;
+static {
+	import std.conv;
+	import std.string;
+}
 
-class CFeature : AEntityPool {
-	this(int _id) pure in (_id >= 0) { super(_id); }
+struct SFeature {
+	mixin TEntity;
 
 	static bool isResurrectable(int featureId) {
 		return gCallback.Feature_getResurrectDef(gSkirmishAIId, featureId) != -1;
 	}
 
-	T getDef(T : CFeatureDef = CFeatureDef)() const {
-		return new T(gCallback.Feature_getDef(gSkirmishAIId, id));
-	}
-	int getDefId() const {
-		return gCallback.Feature_getDef(gSkirmishAIId, id);
+	SFeatureDef getDef() const {
+		return SFeatureDef(gCallback.Feature_getDef(gSkirmishAIId, id));
 	}
 
 	float getHealth() const {
