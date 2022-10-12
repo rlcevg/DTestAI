@@ -51,7 +51,7 @@ struct SMain {
 		_message.initialize(false, false);
 		_parking.initialize(false, false);
 
-		// NB: assumeNoGC is a lie, don't want to edit dplug.core.thread
+		// NB: assumeNoGC is intentional lie, don't want to edit dplug.core.thread
 		_mainThread = launchInAThread(assumeNoGC(&mainLoop));  // failure is not an option, no ErrorD.THREAD
 
 		_parking.wait();  // wait for Runtime.initialize
@@ -103,6 +103,7 @@ private:
 				_ret = _mainError = ErrorD.RUNTIME;
 				return;
 			}
+			version(Windows)
 			_isRuntime = true;
 		} catch (Exception e) {
 			_ret = _mainError = ErrorD.RUNTIME;
@@ -144,7 +145,8 @@ private:
 			_parking.set();
 		}
 
-		// NB: Can't Runtime.terminate here - kills too much stuff and cause issues on Windows
+		version(linux)  // Windows kills stuff and crashes on Dll unload
+		try { Runtime.terminate(); } catch (Exception e) {}
 	}
 
 	int initD(int skirmishAIId, const(SSkirmishAICallback)* innerCallback) {
