@@ -6,6 +6,7 @@ struct SColor4 {
 	ubyte b = 0;
 	ubyte a = 255;
 
+nothrow @nogc:
 	this(ubyte _r, ubyte _g, ubyte _b, ubyte _a = 255) {
 		r = _r;
 		g = _g;

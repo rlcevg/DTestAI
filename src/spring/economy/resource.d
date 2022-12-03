@@ -1,13 +1,13 @@
 module spring.economy.resource;
 
 import spring.bind.callback;
-static import std.conv;
 
 struct SResource {
 	mixin TEntity;
 
-	string getName() const {
-		return std.conv.to!string(gCallback.Resource_getName(gSkirmishAIId, id));
+nothrow @nogc:
+	const(char)* getName() const {
+		return gCallback.Resource_getName(gSkirmishAIId, id);
 	}
 
 	float getOptimum() const {

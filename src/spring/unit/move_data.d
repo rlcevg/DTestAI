@@ -1,11 +1,11 @@
 module spring.unit.move_data;
 
 import spring.bind.callback;
-static import std.conv;
 
 struct SMoveData {
 	mixin TEntity;  // unitDefId
 
+nothrow @nogc:
 	int getSpeedModClass() const {
 		return gCallback.UnitDef_MoveData_getSpeedModClass(gSkirmishAIId, id);
 	}
@@ -50,7 +50,7 @@ struct SMoveData {
 		return gCallback.UnitDef_MoveData_isSubMarine(gSkirmishAIId, id);
 	}
 
-	string getName() const {
-		return std.conv.to!string(gCallback.UnitDef_MoveData_getName(gSkirmishAIId, id));
+	const(char)* getName() const {
+		return gCallback.UnitDef_MoveData_getName(gSkirmishAIId, id);
 	}
 }

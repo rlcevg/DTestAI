@@ -4,12 +4,9 @@ import spring.bind.callback;
 import spring.skirmish.info;
 import spring.skirmish.options;
 import spring.team;
-static {
-	import std.conv;
-	import std.string;
-}
 
 class CSkirmishAI {
+nothrow @nogc:
 	STeam getTeam() const {
 		return STeam(gCallback.SkirmishAI_getTeamId(gSkirmishAIId));
 	}

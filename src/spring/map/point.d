@@ -3,11 +3,11 @@ module spring.map.point;
 import spring.bind.callback;
 import spring.util.float4;
 import spring.util.color4;
-static import std.conv;
 
 struct SPoint {
 	mixin TEntity;
 
+nothrow @nogc:
 	SFloat4 getPosition() const {
 		SFloat4 posF3_out;
 		gCallback.Map_Point_getPosition(gSkirmishAIId, id, posF3_out.ptr);
@@ -20,7 +20,7 @@ struct SPoint {
 		return SColor4(colorS3_out);
 	}
 
-	string getLabel() const {
-		return std.conv.to!string(gCallback.Map_Point_getLabel(gSkirmishAIId, id));
+	const(char)* getLabel() const {
+		return gCallback.Map_Point_getLabel(gSkirmishAIId, id);
 	}
 }

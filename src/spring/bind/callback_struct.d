@@ -17,6 +17,7 @@ extern (C):
  */
 struct SSkirmishAICallback
 {
+nothrow @nogc:
 	/**
 	 * Whenever an AI wants to change the engine state in any way,
 	 * it has to call this method.
@@ -105,13 +106,13 @@ struct SSkirmishAICallback
 	const(char)* function (int skirmishAIId) Engine_Version_getFull;
 
 	/** Returns the number of teams in this game */
-	int function (int skirmishAIId) Teams_getSize;
+	int function (int skirmishAIId) getNumTeams;
 
 	/** Returns the number of skirmish AIs in this game */
-	int function (int skirmishAIId) SkirmishAIs_getSize;
+	int function (int skirmishAIId) getNumSkirmishAIs;
 
 	/** Returns the maximum number of skirmish AIs in any game */
-	int function (int skirmishAIId) SkirmishAIs_getMax;
+	int function (int skirmishAIId) getMaxSkirmishAIs;
 
 	/**
 	 * Returns the ID of the team controled by this Skirmish AI.
@@ -229,11 +230,6 @@ struct SSkirmishAICallback
 	 */
 	bool function (int skirmishAIId, char* path, int path_sizeMax, const char* relPath, bool writeable, bool create, bool dir, bool common) DataDirs_locatePath;
 
-	/**
-	 * @see     locatePath()
-	 */
-	char* function (int skirmishAIId, const char* relPath, bool writeable, bool create, bool dir, bool common) DataDirs_allocatePath;
-
 	/** Returns the number of springs data dirs. */
 	int function (int skirmishAIId) DataDirs_Roots_getSize;
 
@@ -264,8 +260,6 @@ struct SSkirmishAICallback
 	 *          -> the path exists and is stored in an absolute form in path
 	 */
 	bool function (int skirmishAIId, char* path, int path_sizeMax, const char* relPath, bool writeable, bool create, bool dir) DataDirs_Roots_locatePath;
-
-	char* function (int skirmishAIId, const char* relPath, bool writeable, bool create, bool dir) DataDirs_Roots_allocatePath;
 
 	// BEGINN misc callback functions
 	/**
@@ -411,19 +405,6 @@ struct SSkirmishAICallback
 	const(char)* function (int skirmishAIId, const(char)* gameRulesParamName, const(char)* defaultValue) Game_getRulesParamString;
 
 	// END misc callback functions
-
-	// BEGINN Visualization related callback functions
-	float function (int skirmishAIId) Gui_getViewRange;
-
-	float function (int skirmishAIId) Gui_getScreenX;
-
-	float function (int skirmishAIId) Gui_getScreenY;
-
-	void function (int skirmishAIId, float* return_posF3_out) Gui_Camera_getDirection;
-
-	void function (int skirmishAIId, float* return_posF3_out) Gui_Camera_getPosition;
-
-	// END Visualization related callback functions
 
 	// BEGINN OBJECT Cheats
 	/**

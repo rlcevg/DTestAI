@@ -13,6 +13,7 @@ union SFloat4 {
 	Sxyzw s;
 	alias s this;
 
+nothrow @nogc:
 	inout(float*) ptr() inout return { return a.ptr; }
 
 	this(float _x, float _y, float _z, float _w = 0) {
@@ -23,6 +24,13 @@ union SFloat4 {
 	}
 
 	this(in float[3] xyz) {
+		s.x = xyz[0];
+		s.y = xyz[1];
+		s.z = xyz[2];
+		s.w = 0;
+	}
+
+	this(in float* xyz) {
 		s.x = xyz[0];
 		s.y = xyz[1];
 		s.z = xyz[2];

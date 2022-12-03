@@ -2,17 +2,17 @@ module spring.feature.feature_def;
 
 import spring.bind.callback;
 import spring.economy.resource;
-static import std.conv;
 
 struct SFeatureDef {
 	mixin TEntity;
 
-	string getName() const {
-		return std.conv.to!string(gCallback.FeatureDef_getName(gSkirmishAIId, id));
+nothrow @nogc:
+	const(char)* getName() const {
+		return gCallback.FeatureDef_getName(gSkirmishAIId, id);
 	}
 
-	string getDescription() const {
-		return std.conv.to!string(gCallback.FeatureDef_getDescription(gSkirmishAIId, id));
+	const(char)* getDescription() const {
+		return gCallback.FeatureDef_getDescription(gSkirmishAIId, id);
 	}
 
 	float getContainedResource(in SResource resource) const {
@@ -39,8 +39,8 @@ struct SFeatureDef {
 		return gCallback.FeatureDef_getDrawType(gSkirmishAIId, id);
 	}
 
-	string getModelName() const {
-		return std.conv.to!string(gCallback.FeatureDef_getModelName(gSkirmishAIId, id));
+	const(char)* getModelName() const {
+		return gCallback.FeatureDef_getModelName(gSkirmishAIId, id);
 	}
 
 	int getResurrectable() const {
@@ -91,8 +91,9 @@ struct SFeatureDef {
 		return gCallback.FeatureDef_getZSize(gSkirmishAIId, id);
 	}
 
+	import dplug.core.map;
 	mixin TCustomParam;
-	string[string] getCustomParams() const {
+	Map!(const(char)*, const(char)*) getCustomParams() const {
 		return readCustomParams(gCallback.FeatureDef_getCustomParams);
 	}
 }

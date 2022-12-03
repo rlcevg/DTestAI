@@ -7,11 +7,12 @@ import spring.unit.flanking_bonus;
 import spring.unit.move_data;
 import spring.weapon.weapon_mount;
 import spring.util.float4;
-static import std.conv;
+import dplug.core.nogc;
 
 struct SUnitDef {
 	mixin TEntity;
 
+nothrow @nogc:
 	static bool hasYardMap(int unitDefId) {
 		return gCallback.UnitDef_getYardMap(gSkirmishAIId, unitDefId, UnitFacing.UNIT_FACING_SOUTH, null, -1) > 0;
 	}
@@ -32,12 +33,12 @@ struct SUnitDef {
 		return gCallback.UnitDef_getRadius(gSkirmishAIId, id);
 	}
 
-	string getName() const {
-		return std.conv.to!string(gCallback.UnitDef_getName(gSkirmishAIId, id));
+	const(char)* getName() const {
+		return gCallback.UnitDef_getName(gSkirmishAIId, id);
 	}
 
-	string getHumanName() const {
-		return std.conv.to!string(gCallback.UnitDef_getHumanName(gSkirmishAIId, id));
+	const(char)* getHumanName() const {
+		return gCallback.UnitDef_getHumanName(gSkirmishAIId, id);
 	}
 
 	float getUpkeep(in SResource resource) const {
@@ -264,12 +265,12 @@ struct SUnitDef {
 		return gCallback.UnitDef_getMaxWeaponRange(gSkirmishAIId, id);
 	}
 
-	string getTooltip() const {
-		return std.conv.to!string(gCallback.UnitDef_getTooltip(gSkirmishAIId, id));
+	const(char)* getTooltip() const {
+		return gCallback.UnitDef_getTooltip(gSkirmishAIId, id);
 	}
 
-	string getWreckName() const {
-		return std.conv.to!string(gCallback.UnitDef_getWreckName(gSkirmishAIId, id));
+	const(char)* getWreckName() const {
+		return gCallback.UnitDef_getWreckName(gSkirmishAIId, id);
 	}
 
 	int getDeathExplosion() const {
@@ -280,8 +281,8 @@ struct SUnitDef {
 		return gCallback.UnitDef_getSelfDExplosion(gSkirmishAIId, id);
 	}
 
-	string getCategoryString() const {
-		return std.conv.to!string(gCallback.UnitDef_getCategoryString(gSkirmishAIId, id));
+	const(char)* getCategoryString() const {
+		return gCallback.UnitDef_getCategoryString(gSkirmishAIId, id);
 	}
 
 	bool isAbleToSelfD() const {
@@ -469,7 +470,7 @@ struct SUnitDef {
 	}
 
 	short[] getYardMap(UnitFacing facing) const {
-		short[] yardMap = new short [gCallback.UnitDef_getYardMap(gSkirmishAIId, id, facing, null, -1)];
+		short[] yardMap = mallocSliceNoInit!short(gCallback.UnitDef_getYardMap(gSkirmishAIId, id, facing, null, -1));
 		gCallback.UnitDef_getYardMap(gSkirmishAIId, id, facing, yardMap.ptr, cast(int)yardMap.length);
 		return yardMap;
 	}
@@ -686,7 +687,7 @@ struct SUnitDef {
 
 	SUnitDef[] getBuildOptions() const {
 		static assert(SUnitDef.sizeof == int.sizeof);
-		int[] ids = new int [gCallback.UnitDef_getBuildOptions(gSkirmishAIId, id, null, -1)];
+		int[] ids = mallocSliceNoInit!int(gCallback.UnitDef_getBuildOptions(gSkirmishAIId, id, null, -1));
 		gCallback.UnitDef_getBuildOptions(gSkirmishAIId, id, ids.ptr, cast(int)ids.length);
 		return cast(SUnitDef[])ids;
 	}
@@ -700,8 +701,9 @@ struct SUnitDef {
 		return makeSubEntities!SWeaponMount(gCallback.UnitDef_getWeaponMounts);
 	}
 
+	import dplug.core.map;
 	mixin TCustomParam;
-	string[string] getCustomParams() const {
+	Map!(const(char)*, const(char)*) getCustomParams() const {
 		return readCustomParams(gCallback.UnitDef_getCustomParams);
 	}
 }

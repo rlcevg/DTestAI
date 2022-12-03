@@ -1,35 +1,35 @@
 module spring.mod;
 
 import spring.bind.callback;
-static import std.conv;
 
 class CMod {
-	string getFileName() const {
-		return std.conv.to!string(gCallback.Mod_getFileName(gSkirmishAIId));
+nothrow @nogc:
+	const(char)* getFileName() const {
+		return gCallback.Mod_getFileName(gSkirmishAIId);
 	}
 
 	int getHash() const {
 		return gCallback.Mod_getHash(gSkirmishAIId);
 	}
 
-	string getHumanName() const {
-		return std.conv.to!string(gCallback.Mod_getHumanName(gSkirmishAIId));
+	const(char)* getHumanName() const {
+		return gCallback.Mod_getHumanName(gSkirmishAIId);
 	}
 
-	string getShortName() const {
-		return std.conv.to!string(gCallback.Mod_getShortName(gSkirmishAIId));
+	const(char)* getShortName() const {
+		return gCallback.Mod_getShortName(gSkirmishAIId);
 	}
 
-	string getVersion() const {
-		return std.conv.to!string(gCallback.Mod_getVersion(gSkirmishAIId));
+	const(char)* getVersion() const {
+		return gCallback.Mod_getVersion(gSkirmishAIId);
 	}
 
-	string getMutator() const {
-		return std.conv.to!string(gCallback.Mod_getMutator(gSkirmishAIId));
+	const(char)* getMutator() const {
+		return gCallback.Mod_getMutator(gSkirmishAIId);
 	}
 
-	string getDescription() const {
-		return std.conv.to!string(gCallback.Mod_getDescription(gSkirmishAIId));
+	const(char)* getDescription() const {
+		return gCallback.Mod_getDescription(gSkirmishAIId);
 	}
 
 	bool getConstructionDecay() const {

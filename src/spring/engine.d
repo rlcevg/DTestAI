@@ -1,54 +1,54 @@
 module spring.engine;
 
 import spring.bind.callback;
-static import std.conv;
 
 class CEngine {
-	string getVersionFull() const {
-		return std.conv.to!string(gCallback.Engine_Version_getFull(gSkirmishAIId));
+nothrow @nogc:
+	const(char)* getVersionFull() const {
+		return gCallback.Engine_Version_getFull(gSkirmishAIId);
 	}
 
-	string getVersionMajor() const {
-		return std.conv.to!string(gCallback.Engine_Version_getMajor(gSkirmishAIId));
+	const(char)* getVersionMajor() const {
+		return gCallback.Engine_Version_getMajor(gSkirmishAIId);
 	}
 
-	string getVersionMinor() const {
-		return std.conv.to!string(gCallback.Engine_Version_getMinor(gSkirmishAIId));
+	const(char)* getVersionMinor() const {
+		return gCallback.Engine_Version_getMinor(gSkirmishAIId);
 	}
 
-	string getVersionPatchset() const {
-		return std.conv.to!string(gCallback.Engine_Version_getPatchset(gSkirmishAIId));
+	const(char)* getVersionPatchset() const {
+		return gCallback.Engine_Version_getPatchset(gSkirmishAIId);
 	}
 
-	string getVersionCommits() const {
-		return std.conv.to!string(gCallback.Engine_Version_getCommits(gSkirmishAIId));
+	const(char)* getVersionCommits() const {
+		return gCallback.Engine_Version_getCommits(gSkirmishAIId);
 	}
 
-	string getVersionHash() const {
-		return std.conv.to!string(gCallback.Engine_Version_getHash(gSkirmishAIId));
+	const(char)* getVersionHash() const {
+		return gCallback.Engine_Version_getHash(gSkirmishAIId);
 	}
 
-	string getVersionBranch() const {
-		return std.conv.to!string(gCallback.Engine_Version_getBranch(gSkirmishAIId));
+	const(char)* getVersionBranch() const {
+		return gCallback.Engine_Version_getBranch(gSkirmishAIId);
 	}
 
-	string getVersionAdditional() const {
-		return std.conv.to!string(gCallback.Engine_Version_getAdditional(gSkirmishAIId));
+	const(char)* getVersionAdditional() const {
+		return gCallback.Engine_Version_getAdditional(gSkirmishAIId);
 	}
 
-	string getVersionBuildTime() const {
-		return std.conv.to!string(gCallback.Engine_Version_getBuildTime(gSkirmishAIId));
+	const(char)* getVersionBuildTime() const {
+		return gCallback.Engine_Version_getBuildTime(gSkirmishAIId);
 	}
 
 	bool isVersionRelease() const {
 		return gCallback.Engine_Version_isRelease(gSkirmishAIId);
 	}
 
-	string getVersionNormal() const {
-		return std.conv.to!string(gCallback.Engine_Version_getNormal(gSkirmishAIId));
+	const(char)* getVersionNormal() const {
+		return gCallback.Engine_Version_getNormal(gSkirmishAIId);
 	}
 
-	string getVersionSync() const {
-		return std.conv.to!string(gCallback.Engine_Version_getSync(gSkirmishAIId));
+	const(char)* getVersionSync() const {
+		return gCallback.Engine_Version_getSync(gSkirmishAIId);
 	}
 }

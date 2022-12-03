@@ -1,10 +1,12 @@
 module spring.weapon.damage;
 
 import spring.bind.callback;
+import dplug.core.nogc;
 
 struct SDamage {
 	mixin TEntity;  // weaponDefId
 
+nothrow @nogc:
 	int getParalyzeDamageTime() const {
 		return gCallback.WeaponDef_Damage_getParalyzeDamageTime(gSkirmishAIId, id);
 	}
@@ -26,7 +28,7 @@ struct SDamage {
 	}
 
 	float[] getTypes() const {
-		float[] types = new float [gCallback.WeaponDef_Damage_getTypes(gSkirmishAIId, id, null, -1)];
+		float[] types = mallocSliceNoInit!float(gCallback.WeaponDef_Damage_getTypes(gSkirmishAIId, id, null, -1));
 		gCallback.WeaponDef_Damage_getTypes(gSkirmishAIId, id, types.ptr, cast(int)types.length);
 		return types;
 	}

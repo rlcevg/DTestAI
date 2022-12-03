@@ -6,6 +6,7 @@ import spring.economy.resource;
 struct SShield {
 	mixin TEntity;  // weaponDefId
 
+nothrow @nogc:
 	float getResourceUse(in SResource resource) const {
 		return gCallback.WeaponDef_Shield_getResourceUse(gSkirmishAIId, id, resource.id);
 	}

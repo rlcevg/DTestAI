@@ -1,16 +1,16 @@
 module spring.log;
 
 import spring.bind.callback;
-static import std.string;
 
 class CLog {
-	void log(string msg) const
+nothrow @nogc:
+	void log(const(char)* msg) const
 	in (msg) {
-		gCallback.Log_log(gSkirmishAIId, std.string.toStringz(msg));
+		gCallback.Log_log(gSkirmishAIId, msg);
 	}
 
-	void exception(string msg, int severety, bool die) const
+	void exception(const(char)* msg, int severety, bool die) const
 	in (msg) {
-		gCallback.Log_exception(gSkirmishAIId, std.string.toStringz(msg), severety, die);
+		gCallback.Log_exception(gSkirmishAIId, msg, severety, die);
 	}
 }

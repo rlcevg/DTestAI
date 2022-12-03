@@ -6,12 +6,9 @@ import spring.team;
 import spring.economy.resource;
 import spring.util.color4;
 import spring.util.float4;
-static {
-	import std.conv;
-	import std.string;
-}
 
 class CGame {
+nothrow @nogc {
 	int getCurrentFrame() const {
 		return gCallback.Game_getCurrentFrame(gSkirmishAIId);
 	}
@@ -32,8 +29,8 @@ class CGame {
 		return gCallback.Game_getPlayerTeam(gSkirmishAIId, playerId);
 	}
 
-	string getTeamSide(in STeam team) const {
-		return std.conv.to!string(gCallback.Game_getTeamSide(gSkirmishAIId, team.id));
+	const(char)* getTeamSide(in STeam team) const {
+		return gCallback.Game_getTeamSide(gSkirmishAIId, team.id);
 	}
 
 	SColor4 getTeamColor(in STeam team) const {
@@ -98,40 +95,39 @@ class CGame {
 		return gCallback.Game_getSpeedFactor(gSkirmishAIId);
 	}
 
-	string getSetupScript() const {
-		return std.conv.to!string(gCallback.Game_getSetupScript(gSkirmishAIId));
+	const(char)* getSetupScript() const {
+		return gCallback.Game_getSetupScript(gSkirmishAIId);
 	}
 
-	int getCategoryFlag(string categoryName) const
+	int getCategoryFlag(const(char)* categoryName) const
 	in (categoryName) {
-		return gCallback.Game_getCategoryFlag(gSkirmishAIId, std.string.toStringz(categoryName));
+		return gCallback.Game_getCategoryFlag(gSkirmishAIId, categoryName);
 	}
 
-	int getCategoriesFlag(string categoryNames) const
+	int getCategoriesFlag(const(char)* categoryNames) const
 	in (categoryNames) {
-		return gCallback.Game_getCategoriesFlag(gSkirmishAIId, std.string.toStringz(categoryNames));
+		return gCallback.Game_getCategoriesFlag(gSkirmishAIId, categoryNames);
 	}
 
-	string getCategoryName(int categoryFlag) const {
-		char[MAX_CHARS] buffer;
-		gCallback.Game_getCategoryName(gSkirmishAIId, categoryFlag, buffer.ptr, MAX_CHARS);
-		return std.conv.to!string(buffer);
+	const(char)* getCategoryName(int categoryFlag) const {
+		gCallback.Game_getCategoryName(gSkirmishAIId, categoryFlag, _buffer.ptr, MAX_CHARS);
+		return _buffer.ptr;
 	}
 
-	float getRulesParamFloat(string rulesParamName, float defaultValue) const
+	float getRulesParamFloat(const(char)* rulesParamName, float defaultValue) const
 	in (rulesParamName) {
-		return gCallback.Game_getRulesParamFloat(gSkirmishAIId, std.string.toStringz(rulesParamName), defaultValue);
+		return gCallback.Game_getRulesParamFloat(gSkirmishAIId, rulesParamName, defaultValue);
 	}
 
-	string getRulesParamString(string rulesParamName, string defaultValue) const
+	const(char)* getRulesParamString(const(char)* rulesParamName, const(char)* defaultValue) const
 	in (rulesParamName)
 	in (defaultValue) {
-		return std.conv.to!string(gCallback.Game_getRulesParamString(gSkirmishAIId,
-				std.string.toStringz(rulesParamName), std.string.toStringz(defaultValue)));
+		return gCallback.Game_getRulesParamString(gSkirmishAIId, rulesParamName, defaultValue);
 	}
-
-	void sendTextMessage(string text, int zone) const {
-		SSendTextMessageCommand commandData = {text:std.string.toStringz(text), zone:zone};
+}
+@nogc:
+	void sendTextMessage(const(char)* text, int zone) const {
+		SSendTextMessageCommand commandData = {text:text, zone:zone};
 		execCmd(CommandTopic.COMMAND_SEND_TEXT_MESSAGE, &commandData, exceptMsg!__FUNCTION__);
 	}
 
@@ -145,8 +141,11 @@ class CGame {
 		execCmd(CommandTopic.COMMAND_SEND_START_POS, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void setPause(bool enable, string reason) const {
-		SPauseCommand commandData = {enable:enable, reason:std.string.toStringz(reason)};
+	void setPause(bool enable, const(char)* reason) const {
+		SPauseCommand commandData = {enable:enable, reason:reason};
 		execCmd(CommandTopic.COMMAND_PAUSE, &commandData, exceptMsg!__FUNCTION__);
 	}
+
+private:
+	static char[MAX_CHARS] _buffer;
 }

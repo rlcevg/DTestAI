@@ -4,11 +4,11 @@ import spring.bind.callback;
 import spring.economy.resource;
 import spring.weapon.damage;
 import spring.weapon.shield;
-static import std.conv;
 
 struct SWeaponDef {
 	mixin TEntity;
 
+nothrow @nogc:
 	SDamage getDamage() const {
 		return SDamage(id);
 	}
@@ -17,16 +17,16 @@ struct SWeaponDef {
 		return SShield(id);
 	}
 
-	string getName() const {
-		return std.conv.to!string(gCallback.WeaponDef_getName(gSkirmishAIId, id));
+	const(char)* getName() const {
+		return gCallback.WeaponDef_getName(gSkirmishAIId, id);
 	}
 
-	string getType() const {
-		return std.conv.to!string(gCallback.WeaponDef_getType(gSkirmishAIId, id));
+	const(char)* getType() const {
+		return gCallback.WeaponDef_getType(gSkirmishAIId, id);
 	}
 
-	string getDescription() const {
-		return std.conv.to!string(gCallback.WeaponDef_getDescription(gSkirmishAIId, id));
+	const(char)* getDescription() const {
+		return gCallback.WeaponDef_getDescription(gSkirmishAIId, id);
 	}
 
 	float getRange() const {
@@ -397,8 +397,9 @@ struct SWeaponDef {
 		return gCallback.WeaponDef_isDynDamageInverted(gSkirmishAIId, id);
 	}
 
+	import dplug.core.map;
 	mixin TCustomParam;
-	string[string] getCustomParams() const {
+	Map!(const(char)*, const(char)*) getCustomParams() const {
 		return readCustomParams(gCallback.WeaponDef_getCustomParams);
 	}
 }

@@ -12,14 +12,11 @@ import spring.economy.resource;
 import spring.weapon.weapon;
 import spring.weapon.weapon_mount;
 import spring.util.float4;
-static {
-	import std.conv;
-	import std.string;
-}
 
 struct SUnit {
 	mixin TEntity;
 
+nothrow @nogc {
 	SUnitDef getDef() const {
 		return SUnitDef(gCallback.Unit_getDef(gSkirmishAIId, id));
 	}
@@ -32,16 +29,15 @@ struct SUnit {
 		return gCallback.Unit_getMax(gSkirmishAIId);
 	}
 
-	float getRulesParamFloat(string rulesParamName, float defaultValue) const
+	float getRulesParamFloat(const(char)* rulesParamName, float defaultValue) const
 	in (rulesParamName) {
-		return gCallback.Unit_getRulesParamFloat(gSkirmishAIId, id, std.string.toStringz(rulesParamName), defaultValue);
+		return gCallback.Unit_getRulesParamFloat(gSkirmishAIId, id, rulesParamName, defaultValue);
 	}
 
-	string getRulesParamString(string rulesParamName, string defaultValue) const
+	const(char)* getRulesParamString(const(char)* rulesParamName, const(char)* defaultValue) const
 	in (rulesParamName)
 	in (defaultValue) {
-		return std.conv.to!string(gCallback.Unit_getRulesParamString(gSkirmishAIId, id,
-				std.string.toStringz(rulesParamName), std.string.toStringz(defaultValue)));
+		return gCallback.Unit_getRulesParamString(gSkirmishAIId, id, rulesParamName, defaultValue);
 	}
 
 	STeam getTeam() const {
@@ -169,7 +165,8 @@ struct SUnit {
 	SCommandDescription[] getSupportedCommands() const {
 		return makeSubEntities!SCommandDescription(gCallback.Unit_getSupportedCommands);
 	}
-
+}
+@nogc:
 	void build(in SUnitDef toBuildUnitDef, in SFloat4 buildPos, int facing,
 			short options = 0, int timeOut = int.max) const
 	{

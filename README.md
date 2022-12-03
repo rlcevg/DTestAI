@@ -1,7 +1,7 @@
 Dlang AI Interface Wrapper  
 for Spring RTS Engine  
 =========
-(beta version)
+(gamma version)
 * `src/spring` - AI interface wrapper.
 * `src/ai` - AI example.
 * `src/AIExport.d` - DLL interface.

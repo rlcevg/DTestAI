@@ -5,6 +5,7 @@ import spring.bind.commands;
 import spring.util.float4;
 
 class CPathing {
+nothrow @nogc {
 	int initPath(in SFloat4 start, in SFloat4 end, int pathType, float goalRadius) const {
 		SInitPathCommand commandData ={
 			start_posF3:start.ptr,
@@ -28,7 +29,8 @@ class CPathing {
 				CommandTopic.COMMAND_PATH_GET_APPROXIMATE_LENGTH, &commandData);
 		return (internal_ret == 0) ? commandData.ret_approximatePathLength : 0f;
 	}
-
+}
+@nogc:
 	SFloat4 getNextWaypoint(int pathId) const {
 		SFloat4 nextWaypoint_posF3_out;
 		SGetNextWaypointPathCommand commandData = {

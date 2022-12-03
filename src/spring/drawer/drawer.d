@@ -8,9 +8,9 @@ import spring.unit.command;
 import spring.util.float4;
 import spring.util.color4;
 /+public+/ import std.typecons : tuple, Tuple;
-static import std.string;
 
 struct SDrawer {
+@nogc:
 	void addNotification(in SFloat4 pos, in SColor4 color, short alpha) const {
 		short[3] color_colorS3;
 		color.loadInto(color_colorS3);
@@ -18,10 +18,10 @@ struct SDrawer {
 		execCmd(CommandTopic.COMMAND_DRAWER_ADD_NOTIFICATION, &commandData, exceptMsg!__FUNCTION__);
 	}
 
-	void addPoint(in SFloat4 pos, string label) const
+	void addPoint(in SFloat4 pos, const(char)* label) const
 	in (label) {
 		// TODO: ensure that engine makes copy of texLabel
-		SAddPointDrawCommand commandData = {pos_posF3:pos.ptr, label:std.string.toStringz(label)};
+		SAddPointDrawCommand commandData = {pos_posF3:pos.ptr, label:label};
 		execCmd(CommandTopic.COMMAND_DRAWER_POINT_ADD, &commandData, exceptMsg!__FUNCTION__);
 	}
 
@@ -50,6 +50,7 @@ struct SDrawer {
 		execCmd(CommandTopic.COMMAND_DRAWER_DRAW_UNIT, &commandData, exceptMsg!__FUNCTION__);
 	}
 
+nothrow:
 	Tuple!(int, float) traceRay(in SFloat4 rayPos, in SFloat4 rayDir, float rayLen,
 			in SUnit srcUnit, int flags) const
 	{
@@ -89,6 +90,7 @@ struct SDrawer {
 	}
 
 	struct SFigure {
+	nothrow @nogc {
 		int drawSpline(in SFloat4 pos1, in SFloat4 pos2, in SFloat4 pos3, in SFloat4 pos4,
 				float width, bool arrow, int lifeTime, int figureGroupId) const
 		{
@@ -118,7 +120,8 @@ struct SDrawer {
 					CommandTopic.COMMAND_DRAWER_FIGURE_CREATE_LINE, &commandData);
 			return (internal_ret == 0) ? commandData.ret_newFigureGroupId : -1;
 		}
-
+	}
+	@nogc:
 		void setColor(int figureGroupId, in SColor4 color, short alpha) const {
 			short[3] color_colorS3;
 			color.loadInto(color_colorS3);
@@ -137,6 +140,7 @@ struct SDrawer {
 	}
 
 	struct SPathDrawer {
+	@nogc:
 		void start(in SFloat4 pos, in SColor4 color, short alpha) const {
 			short[3] color_colorS3;
 			color.loadInto(color_colorS3);

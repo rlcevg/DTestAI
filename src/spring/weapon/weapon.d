@@ -6,6 +6,7 @@ import spring.weapon.weapon_def;
 struct SWeapon {
 	mixin TSubEntity!"unitId";
 
+nothrow @nogc:
 	SWeaponDef getDef() const {
 		return SWeaponDef(gCallback.Unit_Weapon_getDef(gSkirmishAIId, unitId, id));
 	}

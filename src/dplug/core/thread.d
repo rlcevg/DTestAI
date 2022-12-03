@@ -8,8 +8,6 @@
  *      $(LINK2 http://www.boost.org/LICENSE_1_0.txt, Boost Software License 1.0).
  *    (See accompanying file LICENSE)
  * Authors:   Sean Kelly, Walter Bright, Alex Rønne Petersen, Martin Nowak, David Simcha, Guillaume Piolat
- *
- * EDIT: Thread rip-off.
  */
 module dplug.core.thread;
 
@@ -17,6 +15,8 @@ import core.stdc.stdlib;
 import core.stdc.stdio;
 
 import dplug.core.nogc;
+import dplug.core.lockedqueue;
+import dplug.core.sync;
 
 version(Posix)
     import core.sys.posix.pthread;
@@ -202,15 +202,15 @@ public:
     }
 
 private:
-    version(Posix)
+    version(Posix) 
     {
         pthread_t _id;
     }
-    else version(Windows)
+    else version(Windows) 
     {
         HANDLE _id;
     }
-    else
+    else 
         static assert(false);
 
     // Thread context given to OS thread creation function need to have a constant adress
@@ -303,4 +303,470 @@ Thread launchInAThread(ThreadDelegate dg, size_t stackSize = 0) nothrow @nogc
     Thread t = makeThread(dg, stackSize);
     t.start();
     return t;
+}
+
+//
+// Thread-pool
+//
+
+/// Returns: Number of CPUs.
+int getTotalNumberOfCPUs() nothrow @nogc
+{
+    version(Windows)
+    {
+        import core.sys.windows.windows : SYSTEM_INFO, GetSystemInfo;
+        SYSTEM_INFO si;
+        GetSystemInfo(&si);
+        int procs = cast(int) si.dwNumberOfProcessors;
+        if (procs < 1)
+            procs = 1;
+        return procs;
+    }
+    else version(Darwin)
+    {
+        auto nameStr = "machdep.cpu.core_count\0".ptr;
+        uint ans;
+        size_t len = uint.sizeof;
+        sysctlbyname(nameStr, &ans, &len, null, 0);
+        return cast(int)ans;
+    }
+    else version(Posix)
+    {
+        import core.sys.posix.unistd : _SC_NPROCESSORS_ONLN, sysconf;
+        return cast(int) sysconf(_SC_NPROCESSORS_ONLN);
+    }
+    else
+        static assert(false, "OS unsupported");
+}
+
+alias ThreadPoolDelegate = void delegate(int workItem, int threadIndex) nothrow @nogc;
+
+
+debug(threadPoolIsActuallySynchronous)
+{
+    /// Fake synchronous version of the thread pool
+    /// For measurement purpose, makes it easier to measure actual CPU time spent.
+    class ThreadPool
+    {
+    public:
+    nothrow:
+    @nogc:
+
+        enum constantThreadId = 0;
+
+        this(int numThreads = 0, int maxThreads = 0, size_t stackSize = 0)
+        {
+        }
+
+        ~this()
+        {
+        }
+
+        void parallelFor(int count, scope ThreadPoolDelegate dg)
+        {
+            foreach(i; 0..count)
+                dg(cast(int)i, constantThreadId);
+        }
+
+        void parallelForAsync(int count, scope ThreadPoolDelegate dg)
+        {
+            foreach(i; 0..count)
+                dg(cast(int)i, constantThreadId);
+        }
+
+        /// Wait for completion of the previous parallelFor, if any.
+        // It's always safe to call this function before doing another parallelFor.
+        void waitForCompletion()
+        {
+        }
+
+        int numThreads() pure const
+        {
+            return 1;
+        }
+    }
+}
+else
+{
+
+    /// Rewrite of the ThreadPool using condition variables.
+    /// FUTURE: this could be speed-up by using futures. Description of the task
+    ///         and associated condition+mutex would go in an external struct.
+    /// Note: the interface of the thread-pool itself is not thread-safe, you cannot give orders from
+    ///       multiple threads at once.
+    class ThreadPool
+    {
+    public:
+    nothrow:
+    @nogc:
+
+        /// Creates a thread-pool.
+        /// Params:
+        ///     numThreads Number of threads to create (0 = auto).
+        ///     maxThreads A maximum number of threads to create (0 = none).
+        ///     stackSize Stack size to create threads with (0 = auto).
+        this(int numThreads = 0, int maxThreads = 0, size_t stackSize = 0)
+        {
+            // Create sync first
+            _workMutex = makeMutex();
+            _workCondition = makeConditionVariable();
+
+            _finishMutex = makeMutex();
+            _finishCondition = makeConditionVariable();
+
+            // Create threads
+            if (numThreads == 0)
+                numThreads = getTotalNumberOfCPUs();
+
+            // Limit number of threads eventually (this is done to give other software some leeway
+            // in a soft real-time OS)
+            if (maxThreads != 0)
+            {
+                if (numThreads > maxThreads)
+                    numThreads = maxThreads;
+            }
+
+            assert(numThreads >= 1);
+
+            _threads = mallocSlice!Thread(numThreads);
+            foreach(size_t threadIndex, ref thread; _threads)
+            {
+                // Pass the index of the thread through user data, so that it can be passed to the task in 
+                // case these task need thread-local buffers.
+                void* userData = cast(void*)(threadIndex);
+                thread = makeThread(&workerThreadFunc, stackSize, userData);
+            }
+
+            // because of calling currentThreadId, don't start threads until all are created
+            foreach(ref thread; _threads)
+            {
+                thread.start();
+            }
+        }
+
+        /// Destroys a thread-pool.
+        ~this()
+        {
+            if (_threads !is null)
+            {
+                assert(_state == State.initial);
+
+                // Put the threadpool is stop state
+                _workMutex.lock();
+                    _stopFlag = true;
+                _workMutex.unlock();
+
+                // Notify all workers
+                _workCondition.notifyAll();
+
+                // Wait for each thread termination
+                foreach(ref thread; _threads)
+                    thread.join();
+
+                // Detroys each thread
+                foreach(ref thread; _threads)
+                    thread.destroy();
+                freeSlice(_threads);
+                _threads = null;
+                destroy(_workMutex);
+            }
+        }
+
+        /// Calls the delegate in parallel, with 0..count as index.
+        /// Immediate waiting for completion.
+        void parallelFor(int count, scope ThreadPoolDelegate dg)
+        {
+            assert(_state == State.initial);
+
+            // Do not launch worker threads for one work-item, not worth it.
+            // (but it is worth it in async).
+            if (count == 1)
+            {
+                int dummythreadID = 0; // it should not matter which is passed as long as it's a valid ID.
+                dg(0, dummythreadID);
+                return;
+            }
+
+            // Unleash parallel threads.
+            parallelForAsync(count, dg);
+
+            // Wait for completion immediately.
+            waitForCompletion(); 
+        }
+
+        /// Same, but does not wait for completion. 
+        /// You cannot have 2 concurrent parallelFor for the same thread-pool.
+        void parallelForAsync(int count, scope ThreadPoolDelegate dg)
+        {
+            assert(_state == State.initial);
+
+            if (count == 0) // no tasks, exit immediately
+                return;
+
+            // At this point we assume all worker threads are waiting for messages
+
+            // Sets the current task
+            _workMutex.lock();
+
+            _taskDelegate = dg;       // immutable during this parallelFor
+            _taskNumWorkItem = count; // immutable during this parallelFor
+            _taskCurrentWorkItem = 0;
+            _taskCompleted = 0;
+
+            _workMutex.unlock();
+
+            if (count >= _threads.length)
+            {
+                // wake up all threads
+                // FUTURE: if number of tasks < number of threads only wake up the necessary amount of threads
+                _workCondition.notifyAll();
+            }
+            else
+            {
+                // Less tasks than threads in the pool: only wake-up some threads.
+                for (int t = 0; t < count; ++t)
+                    _workCondition.notifyOne();
+            }
+
+            _state = State.parallelForInProgress;
+        }
+
+        /// Wait for completion of the previous parallelFor, if any.
+        // It's always safe to call this function before doing another parallelFor.
+        void waitForCompletion()
+        {
+            if (_state == State.initial)
+                return; // that means that parallel threads were not launched
+
+            assert(_state == State.parallelForInProgress);
+
+            _finishMutex.lock();
+            scope(exit) _finishMutex.unlock();
+
+            // FUTURE: order thread will be waken up multiple times
+            //         (one for every completed task)
+            //         maybe that can be optimized
+            while (_taskCompleted < _taskNumWorkItem)
+            {
+                _finishCondition.wait(&_finishMutex);
+            }
+
+            _state = State.initial;
+        }
+
+        int numThreads() pure const
+        {
+            return cast(int)_threads.length;
+        }
+
+    private:
+        Thread[] _threads = null;
+
+        // A map to find back thread index from thread system ID
+        void*[] _threadID = null;
+
+        // Used to signal more work
+        UncheckedMutex _workMutex;
+        ConditionVariable _workCondition;
+
+        // Used to signal completion
+        UncheckedMutex _finishMutex;
+        ConditionVariable _finishCondition;
+
+        // These fields represent the current task group (ie. a parallelFor)
+        ThreadPoolDelegate _taskDelegate;
+        int _taskNumWorkItem;     // total number of tasks in this task group
+        int _taskCurrentWorkItem; // current task still left to do (protected by _workMutex)
+        int _taskCompleted;       // every task < taskCompleted has already been completed (protected by _finishMutex)
+
+        bool _stopFlag;
+
+        bool hasWork()
+        {
+            return _taskCurrentWorkItem < _taskNumWorkItem;
+        }
+
+        // Represent the thread-pool state from the user POV
+        enum State
+        {
+            initial,               // tasks can be launched
+            parallelForInProgress, // task were launched, but not waited one
+        }
+        State _state = State.initial;
+
+        // What worker threads do
+        // MAYDO: threads come here with bad context with struct delegates
+        void workerThreadFunc(void* userData)
+        {
+            while (true)
+            {
+                int workItem = -1;
+                {
+                    _workMutex.lock();
+                    scope(exit) _workMutex.unlock();
+
+                    // Wait for notification
+                    while (!_stopFlag && !hasWork())
+                        _workCondition.wait(&_workMutex);
+
+                    if (_stopFlag && !hasWork())
+                        return;
+
+                    assert(hasWork());
+
+                    // Pick a task and increment counter
+                    workItem = _taskCurrentWorkItem;
+                    _taskCurrentWorkItem++;
+                }
+
+                // Find thread index from user data set by pool
+                int threadIndex = cast(int)( cast(size_t)(userData) );
+
+                // Do the actual task
+                _taskDelegate(workItem, threadIndex);
+
+                // signal completion of one more task
+                {
+                    _finishMutex.lock();
+                    _taskCompleted++;
+                    _finishMutex.unlock();
+
+                    _finishCondition.notifyOne(); // wake-up
+                }
+            }
+        }
+    }
+}
+
+
+unittest
+{
+    import core.atomic;
+    import dplug.core.nogc;
+
+    struct A
+    {
+        ThreadPool _pool;
+        int _numThreads;
+
+        this(int numThreads, int maxThreads = 0, int stackSize = 0)
+        {
+            _pool = mallocNew!ThreadPool(numThreads, maxThreads, stackSize);
+            _numThreads = _pool.numThreads();
+        }
+
+        ~this()
+        {
+            _pool.destroy();
+        }
+
+        void launch(int count, bool async) nothrow @nogc
+        {
+            if (async)
+            {
+                _pool.parallelForAsync(count, &loopBody);
+                _pool.waitForCompletion();
+            }
+            else
+                _pool.parallelFor(count, &loopBody);
+        }
+
+        void loopBody(int workItem, int threadIndex) nothrow @nogc
+        {
+            bool goodIndex = (threadIndex >= 0) && (threadIndex < _numThreads);
+            assert(goodIndex);
+            atomicOp!"+="(counter, 1);
+        }
+
+        shared(int) counter = 0;
+    }
+
+    foreach (numThreads;  [0, 1, 2, 4, 8, 16, 32])
+    {
+        auto a = A(numThreads);
+        a.launch(10, false);
+        assert(a.counter == 10);
+
+        a.launch(500, true);
+        assert(a.counter == 510);
+
+        a.launch(1, false);
+        assert(a.counter == 511);
+
+        a.launch(1, true);
+        assert(a.counter == 512);
+
+        a.launch(0, true);
+        assert(a.counter == 512);
+        a.launch(0, false);
+        assert(a.counter == 512);
+    }
+}
+
+// Bonus: Capacity to get the macOS version
+
+version(Darwin)
+{
+
+    // Note: .init value is a large future version (100.0.0), so that failure to detect version
+    // lead to newer behaviour.
+    struct MacOSVersion
+    {
+        int major = 100; // eg: major = 10   minor = 7 for 10.7
+        int minor = 0;
+        int patch = 0;
+    }
+
+    /// Get the macOS version we are running on.
+    /// Note: it only makes sense for macOS, not iOS.
+    /// Note: patch always return zero for now.
+    MacOSVersion getMacOSVersion() nothrow @nogc
+    {
+        char[256] str;
+        size_t size = 256;
+        int ret = sysctlbyname("kern.osrelease", str.ptr, &size, null, 0);
+        MacOSVersion result;
+        if (ret != 0) 
+            return result;
+        int darwinMajor, darwinMinor, darwinPatch;
+        if (3 == sscanf(str.ptr, "%d.%d.%d", &darwinMajor, &darwinMinor, &darwinPatch))
+        {
+            result.patch = 0;
+
+            switch(darwinMajor)
+            {
+                case 0: .. case 11:
+                    result.major = 10; // 10.7
+                    result.minor = 7;
+                    break;
+
+                case 12: .. case 19:
+                    result.major = 10; // 10.7
+                    result.minor = darwinMajor - 4; // 10.8 to 10.15
+                    break;
+
+                case 20:
+                    result.major = 11; // Big Sur
+                    result.minor = 0;
+                    break;
+
+                case 21:
+                    result.major = 12; // Monterey
+                    result.minor = 0;
+                    break;
+
+
+                default:
+                    result.major = 100;
+                    result.minor = 0;
+            }
+        }
+        return result;
+    }
+
+  /*  unittest
+    {
+        MacOSVersion ver = getMacOSVersion();
+        printf("Detected macOS %d.%d.%d\n", ver.major, ver.minor, ver.patch);
+    } */
 }

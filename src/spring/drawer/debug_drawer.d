@@ -3,9 +3,9 @@ module spring.drawer.debug_drawer;
 import spring.bind.callback;
 import spring.bind.commands;
 import spring.drawer.graph_drawer;
-static import std.string;
 
 class CDebugDrawer {
+nothrow @nogc:
 	SGraphDrawer getGraphDrawer() const {
 		return SGraphDrawer();
 	}
@@ -20,6 +20,7 @@ class CDebugDrawer {
 	struct SOverlayTexture {
 		mixin TEntity;
 
+	@nogc:
 		void update(in float[] texData, int x, int y, int w, int h) const {
 			SUpdateOverlayTextureDrawerDebugCommand commandData = {id, texData.ptr, x, y, w, h};
 			execCmd(CommandTopic.COMMAND_DEBUG_DRAWER_OVERLAYTEXTURE_UPDATE, &commandData, exceptMsg!__FUNCTION__);
@@ -40,10 +41,10 @@ class CDebugDrawer {
 			execCmd(CommandTopic.COMMAND_DEBUG_DRAWER_OVERLAYTEXTURE_SET_SIZE, &commandData, exceptMsg!__FUNCTION__);
 		}
 
-		void setLabel(string texLabel) const
+		void setLabel(const(char)* texLabel) const
 		in (texLabel) {
 			// TODO: ensure that engine makes copy of texLabel
-			SSetLabelOverlayTextureDrawerDebugCommand commandData = {id, std.string.toStringz(texLabel)};
+			SSetLabelOverlayTextureDrawerDebugCommand commandData = {id, texLabel};
 			execCmd(CommandTopic.COMMAND_DEBUG_DRAWER_OVERLAYTEXTURE_SET_LABEL, &commandData, exceptMsg!__FUNCTION__);
 		}
 	}

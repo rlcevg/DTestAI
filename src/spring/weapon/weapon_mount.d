@@ -3,13 +3,13 @@ module spring.weapon.weapon_mount;
 import spring.bind.callback;
 import spring.weapon.weapon_def;
 import spring.util.float4;
-static import std.conv;
 
 struct SWeaponMount {
 	mixin TSubEntity!"unitDefId";
 
-	string getName() const {
-		return std.conv.to!string(gCallback.UnitDef_WeaponMount_getName(gSkirmishAIId, unitDefId, id));
+nothrow @nogc:
+	const(char)* getName() const {
+		return gCallback.UnitDef_WeaponMount_getName(gSkirmishAIId, unitDefId, id);
 	}
 
 	SWeaponDef getWeaponDef() const {

@@ -7,6 +7,7 @@ import spring.unit.unit;
 import spring.economy.resource;
 
 class CEconomy {
+nothrow @nogc:
 	float getCurrent(in SResource resource) const {
 		return gCallback.Economy_getCurrent(gSkirmishAIId, resource.id);
 	}

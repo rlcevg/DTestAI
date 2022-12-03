@@ -6,6 +6,7 @@ import spring.util.float4;
 struct SFlankingBonus {
 	mixin TEntity;  // unitDefId
 
+nothrow @nogc:
 	int getMode() const {
 		return gCallback.UnitDef_FlankingBonus_getMode(gSkirmishAIId, id);
 	}

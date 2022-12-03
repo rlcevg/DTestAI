@@ -1,5 +1,5 @@
 import spring.bind.callback : SSkirmishAICallback;
-import dmain : SMain;
+import dmain : mainC;
 
 version(unittest)
 int main() {
@@ -8,7 +8,7 @@ int main() {
 
 version(Windows) {
 	import core.sys.windows.windef : HINSTANCE, BOOL, DWORD, LPVOID;
-	extern (Windows) BOOL DllMain(HINSTANCE hInstance, DWORD ulReason, LPVOID reserved) {
+	extern (Windows) BOOL DllMain(HINSTANCE hInstance, DWORD ulReason, LPVOID reserved) { // @suppress(dscanner.style.phobos_naming_convention)
 		import core.sys.windows.winnt;
 		import core.sys.windows.dll : dll_process_attach, dll_process_detach, dll_thread_attach, dll_thread_detach;
 		switch (ulReason) {
@@ -28,29 +28,25 @@ version(Windows) {
 
 pragma(crt_constructor)
 extern (C) void initDll() nothrow @nogc {
-	proxy.ctor();
+	mainC.ctor();
 }
 
 pragma(crt_destructor)
 extern (C) void finiDll() nothrow @nogc {
-	proxy.dtor();
+	mainC.dtor();
 }
-
-SMain proxy;
 
 
 extern (C) export nothrow @nogc:
 
 int init(int skirmishAIId, const(SSkirmishAICallback)* innerCallback) {
-	proxy.initialize();
-	return proxy.initC(skirmishAIId, innerCallback);
+	return mainC.initialize(skirmishAIId, innerCallback);
 }
 
 int release(int skirmishAIId) {
-	scope(exit) proxy.terminate();
-	return proxy.releaseC(skirmishAIId);
+	return mainC.terminate(skirmishAIId);
 }
 
 int handleEvent(int skirmishAIId, int topic, const(void)* data) {
-	return proxy.handleEventC(skirmishAIId, topic, data);
+	return mainC.handleEvent(skirmishAIId, topic, data);
 }

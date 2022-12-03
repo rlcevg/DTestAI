@@ -7,6 +7,7 @@ import spring.util.color4;
 struct SLine {
 	mixin TEntity;
 
+nothrow @nogc:
 	SFloat4 getFirstPosition() const {
 		SFloat4 posF3_out;
 		gCallback.Map_Line_getFirstPosition(gSkirmishAIId, id, posF3_out.ptr);

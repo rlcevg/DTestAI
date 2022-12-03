@@ -3,14 +3,11 @@ module spring.feature.feature;
 import spring.bind.callback;
 import spring.feature.feature_def;
 import spring.util.float4;
-static {
-	import std.conv;
-	import std.string;
-}
 
 struct SFeature {
 	mixin TEntity;
 
+nothrow @nogc:
 	static bool isResurrectable(int featureId) {
 		return gCallback.Feature_getResurrectDef(gSkirmishAIId, featureId) != -1;
 	}
@@ -33,16 +30,16 @@ struct SFeature {
 		return posF3_out;
 	}
 
-	float getRulesParamFloat(string rulesParamName, float defaultValue) const
+	float getRulesParamFloat(const(char)* rulesParamName, float defaultValue) const
 	in (rulesParamName) {
-		return gCallback.Feature_getRulesParamFloat(gSkirmishAIId, id, std.string.toStringz(rulesParamName), defaultValue);
+		return gCallback.Feature_getRulesParamFloat(gSkirmishAIId, id, rulesParamName, defaultValue);
 	}
 
-	string getRulesParamString(string rulesParamName, string defaultValue) const
+	const(char)* getRulesParamString(const(char)* rulesParamName, const(char)* defaultValue) const
 	in (rulesParamName)
 	in (defaultValue) {
-		return std.conv.to!string(gCallback.Feature_getRulesParamString(gSkirmishAIId, id,
-				std.string.toStringz(rulesParamName), std.string.toStringz(defaultValue)));
+		return gCallback.Feature_getRulesParamString(gSkirmishAIId, id,
+				rulesParamName, defaultValue);
 	}
 
 	int getResurrectDef() const {

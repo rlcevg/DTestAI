@@ -5,6 +5,7 @@ import spring.bind.callback;
 struct SGroup {
 	mixin TEntity;
 
+nothrow @nogc:
 	bool isSelected() const {
 		return gCallback.Group_isSelected(gSkirmishAIId, id);
 	}

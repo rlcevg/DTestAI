@@ -1,6 +1,6 @@
 {
 	"name": "dtestai",
-	"description": "D example AI with C binding for Spring RTS.",
+	"description": "Example of async AI in D with C binding for Spring RTS.",
 	"authors": [
 		"rlcevg"
 	],

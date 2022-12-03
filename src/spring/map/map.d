@@ -8,9 +8,11 @@ import spring.unit.unit_def;
 import spring.util.float4;
 import spring.map.point;
 import spring.map.line;
-static import std.conv;
+import dplug.core.nogc;
+import dplug.core.vec;
 
 class CMap {
+nothrow @nogc:
 	SDrawer getDrawer() const {
 		return SDrawer();
 	}
@@ -43,12 +45,12 @@ class CMap {
 		return gCallback.Map_getHeight(gSkirmishAIId);
 	}
 
-	void getHeightMap(ref float[] heights) const {
-		fillVec(gCallback.Map_getHeightMap, heights);
+	float[] getHeightMap(float[] heights = []) const {
+		return fillVec(gCallback.Map_getHeightMap, heights);
 	}
 
-	void getCornersHeightMap(ref float[] cornerHeights) const {
-		fillVec(gCallback.Map_getCornersHeightMap, cornerHeights);
+	float[] getCornersHeightMap(float[] cornerHeights = []) const {
+		return fillVec(gCallback.Map_getCornersHeightMap, cornerHeights);
 	}
 
 	float getMinHeight() const {
@@ -59,55 +61,59 @@ class CMap {
 		return gCallback.Map_getMaxHeight(gSkirmishAIId);
 	}
 
-	void getSlopeMap(ref float[] slopes) const {
-		fillVec(gCallback.Map_getSlopeMap, slopes);
+	float[] getSlopeMap(float[] slopes = []) const {
+		return fillVec(gCallback.Map_getSlopeMap, slopes);
 	}
 
-	void getLosMap(ref int[] losValues) const {
-		fillVec(gCallback.Map_getLosMap, losValues);
+	int[] getLosMap(int[] losValues = []) const {
+		return fillVec(gCallback.Map_getLosMap, losValues);
 	}
 
-	void getAirLosMap(ref int[] airLosValues) const {
-		fillVec(gCallback.Map_getAirLosMap, airLosValues);
+	int[] getAirLosMap(int[] airLosValues = []) const {
+		return fillVec(gCallback.Map_getAirLosMap, airLosValues);
 	}
 
-	void getRadarMap(ref int[] radarValues) const {
-		fillVec(gCallback.Map_getRadarMap, radarValues);
+	int[] getRadarMap(int[] radarValues = []) const {
+		return fillVec(gCallback.Map_getRadarMap, radarValues);
 	}
 
-	void getSonarMap(ref int[] sonarValues) const {
-		fillVec(gCallback.Map_getSonarMap, sonarValues);
+	int[] getSonarMap(int[] sonarValues = []) const {
+		return fillVec(gCallback.Map_getSonarMap, sonarValues);
 	}
 
-	void getSeismicMap(ref int[] seismicValues) const {
-		fillVec(gCallback.Map_getSeismicMap, seismicValues);
+	int[] getSeismicMap(int[] seismicValues = []) const {
+		return fillVec(gCallback.Map_getSeismicMap, seismicValues);
 	}
 
-	void getJammerMap(ref int[] jammerValues) const {
-		fillVec(gCallback.Map_getJammerMap, jammerValues);
+	int[] getJammerMap(int[] jammerValues = []) const {
+		return fillVec(gCallback.Map_getJammerMap, jammerValues);
 	}
 
-	void getSonarJammerMap(ref int[] sonarJammerValues) const {
-		fillVec(gCallback.Map_getSonarJammerMap, sonarJammerValues);
+	int[] getSonarJammerMap(int[] sonarJammerValues = []) const {
+		return fillVec(gCallback.Map_getSonarJammerMap, sonarJammerValues);
 	}
 
-	short[] getResourceMapRaw(in SResource resource) const {
-		short[] resources = new short [gCallback.Map_getResourceMapRaw(gSkirmishAIId, resource.id, null, -1)];
-		gCallback.Map_getResourceMapRaw(gSkirmishAIId, resource.id, resources.ptr, cast(int)resources.length);
-		return resources;
+	short[] getResourceMapRaw(in SResource resource, short[] resources = []) const {
+		if (resources.length == 0)
+			resources = mallocSliceNoInit!short(gCallback.Map_getResourceMapRaw(gSkirmishAIId, resource.id, null, -1));
+		int size = gCallback.Map_getResourceMapRaw(gSkirmishAIId, resource.id, resources.ptr, cast(int)resources.length);
+		return resources[0..size];
 	}
 
-	SFloat4[] getResourceMapSpotsPositions(in SResource resource) const {
+	SFloat4[] getResourceMapSpotsPositions(in SResource resource, SFloat4[] spots = []) const {
 		int spots_size_raw = gCallback.Map_getResourceMapSpotsPositions(gSkirmishAIId, resource.id, null, -1);
 		if (spots_size_raw % 3 != 0)
 			return [];  // error
-		float[] spots_AposF3 = new float [spots_size_raw];  // spots_AposF3.destroy();
+		float[10_000 * 3] spots_AposF3;  // stack
+		if (spots_size_raw < spots_AposF3.length)
+			spots_size_raw = spots_AposF3.length;
 		gCallback.Map_getResourceMapSpotsPositions(gSkirmishAIId, resource.id, spots_AposF3.ptr, spots_size_raw);
-		SFloat4[] spots;
-		spots.reserve(spots_size_raw / 3);
-		for (int i = 0; i < spots_size_raw; i += 3)
-			spots ~= SFloat4(spots_AposF3[i], spots_AposF3[i + 1], spots_AposF3[i + 2]);
-		return spots;
+		int size = spots_size_raw / 3;
+		if (spots.length == 0)
+			spots = mallocSliceNoInit!SFloat4(size);
+		foreach (i; 0 .. size)
+			spots[i] = SFloat4(spots_AposF3[i * 3 + 0], spots_AposF3[i * 3 + 1], spots_AposF3[i * 3 + 2]);
+		return spots[0..size];
 	}
 
 	float getResourceMapSpotsAverageIncome(in SResource resource) const {
@@ -124,12 +130,12 @@ class CMap {
 		return gCallback.Map_getHash(gSkirmishAIId);
 	}
 
-	string getName() const {
-		return std.conv.to!string(gCallback.Map_getName(gSkirmishAIId));
+	const(char)* getName() const {
+		return gCallback.Map_getName(gSkirmishAIId);
 	}
 
-	string getHumanName() const {
-		return std.conv.to!string(gCallback.Map_getHumanName(gSkirmishAIId));
+	const(char)* getHumanName() const {
+		return gCallback.Map_getHumanName(gSkirmishAIId);
 	}
 
 	float getElevationAt(float x, float z) const {
@@ -172,16 +178,15 @@ class CMap {
 		return gCallback.Map_getHardness(gSkirmishAIId);
 	}
 
-	float[] getHardnessModMap() const {
-		float[] hardMods;
-		fillVec(gCallback.Map_getHardnessModMap, hardMods);
-		return hardMods;
+	float[] getHardnessModMap(float[] hardMods = []) const {
+		return fillVec(gCallback.Map_getHardnessModMap, hardMods);
 	}
 
-	float[] getSpeedModMap(int speedModClass) const {
-		float[] speedMods = new float [gCallback.Map_getSpeedModMap(gSkirmishAIId, speedModClass, null, -1)];
-		gCallback.Map_getSpeedModMap(gSkirmishAIId, speedModClass, speedMods.ptr, cast(int)speedMods.length);
-		return speedMods;
+	float[] getSpeedModMap(int speedModClass, float[] speedMods = []) const {
+		if (speedMods.length == 0)
+			speedMods = mallocSliceNoInit!float(gCallback.Map_getSpeedModMap(gSkirmishAIId, speedModClass, null, -1));
+		int size = gCallback.Map_getSpeedModMap(gSkirmishAIId, speedModClass, speedMods.ptr, cast(int)speedMods.length);
+		return speedMods[0..size];
 	}
 
 	SPoint[] getPoints(bool includeAllies) {
@@ -197,7 +202,7 @@ class CMap {
 	}
 
 	SFloat4 findClosestBuildSite(in SUnitDef unitDef, in SFloat4 pos,
-			float searchRadius, int minDist, UnitFacing facing) const
+		float searchRadius, int minDist, UnitFacing facing) const
 	{
 		SFloat4 posF3_out;
 		gCallback.Map_findClosestBuildSite(gSkirmishAIId, unitDef.id, pos.ptr,
@@ -206,19 +211,20 @@ class CMap {
 	}
 
 private:
-	SPoint[] _points;
-	SLine[] _lines;
+	Vec!SPoint _points;
+	Vec!SLine _lines;
 
-	void fillVec(T, F)(F readValues, ref T[] values) const {
+	T[] fillVec(T, F)(F readValues, T[] values) const {
 		if (values.length == 0)
-			values.length = readValues(gSkirmishAIId, null, -1);
-		readValues(gSkirmishAIId, values.ptr, cast(int)values.length);
+			values = mallocSliceNoInit!T(readValues(gSkirmishAIId, null, -1));
+		int size = readValues(gSkirmishAIId, values.ptr, cast(int)values.length);
+		return values[0..size];
 	}
 
-	T[] makeArray(T, F)(F readSize, ref T[] buffer, bool includeAllies) {
+	T[] makeArray(T, F)(F readSize, ref Vec!T buffer, bool includeAllies) {
 		int lastSize = cast(int)buffer.length;
 		int newSize = readSize(gSkirmishAIId, includeAllies);
-		buffer.reserve(newSize);
+		buffer.resize(newSize);
 		foreach (i; lastSize .. newSize)
 			buffer ~= T(i);
 		return buffer[0..newSize];
